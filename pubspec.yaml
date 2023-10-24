@@ -1,0 +1,55 @@
+name: budgettap
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.1.2 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get: ^4.1.4  # Make sure to specify the version number here
+  cupertino_icons: ^1.0.2
+  font_awesome_flutter: ^10.5.0
+  font_awesome_metadata: ^1.0.1
+  firebase_auth: ^4.10.1
+  firebase_core: ^2.19.0
+  flutter_native_splash: ^2.3.4
+  provider: ^6.0.5
+  firebase_ui_auth: ^1.9.1
+  firebase_database: ^10.3.1
+  google_fonts: ^6.1.0
+  flutter_facebook_auth: ^6.0.2
+  google_sign_in: ^6.1.5
+  smooth_page_indicator: ^1.1.0
+  lottie: ^2.7.0
+ 
+    
+# flutter_native_splash-development.yaml
+flutter_native_splash:
+  color: "#000000"
+  image: assets/img/logo.png
+  color_dark: "#000000"
+  image_dark: assets/img/logo.png
+ 
+
+  android_12:
+    image: assets/img/logo.png
+    icon_background_color: "#000000"
+    image_dark: assets/img/logo.png
+    icon_background_color_dark: "#000000"
+
+  web: false
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/img/
+    - assets/animation/
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
