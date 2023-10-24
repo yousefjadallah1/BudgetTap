@@ -25,12 +25,15 @@ class AuthController extends GetxController {
       print("Login page");
       Get.off(() => WelcomePage());
     } else {
-      Get.off(() => MyHomePage(email: user.email!));
+      Get.off(() => MyHomePage(uid: user.uid));
     }
   }
 
   Future<void> register(
-      String email, String password, String reEnterPassword) async {
+    String email,
+    String password,
+    String reEnterPassword,
+  ) async {
     if (password != reEnterPassword) {
       // Passwords do not match
       Get.snackbar(
@@ -52,10 +55,16 @@ class AuthController extends GetxController {
 
       // Get the user ID (UID)
       String uid = userCredential.user!.uid;
-
+// Store user data in Firestore
+      // await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      //   'email': email,
+      //   'firstName': firstName,
+      //   'lastName': lastName,
+      // });
       // Registration successful
       // You can perform any further actions after successful registration here
       print('User registered: $uid');
+
       // Navigate to the desired screen after successful registration if needed
     } on FirebaseAuthException catch (e) {
       // Registration failed
@@ -141,13 +150,14 @@ class AuthService {
           await _auth.signInWithCredential(credential);
 
       // Get the user's email address
-      String? userEmail = userCredential.user?.displayName;
+      String? userEmail = userCredential.user?.email;
 
       // Call the callback function with the email
       onEmailReceived(userEmail!);
+      String uid = userCredential.user!.uid;
 
       // Navigate to MyHomePage
-      Get.off(() => MyHomePage(email: userEmail));
+      Get.off(() => MyHomePage(uid: uid));
     } catch (error) {
       // Handle sign-in errors here
       print(error.toString());

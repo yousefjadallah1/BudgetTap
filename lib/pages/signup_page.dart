@@ -29,6 +29,8 @@ class _SignUpPageState extends State<SignUpPage> {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
   var reEnterPasswordController = TextEditingController();
+  var firstName = TextEditingController();
+  var lastName = TextEditingController();
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
@@ -43,12 +45,13 @@ class _SignUpPageState extends State<SignUpPage> {
             children: [
               Container(
                 width: w * 0.3,
+                height: h * 0.3,
                 child: LogoWidget(
                   "assets/img/logoB_noback.png",
                 ),
                 //height: h * 0.2,
               ),
-              SizedBox(height: 10),
+              //SizedBox(height: 5),
               Center(
                 child: Text(
                   "Sign Up",
@@ -62,7 +65,80 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               SizedBox(height: 15),
+              // Container(
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Expanded(
+              //         flex: 2,
+              //         child: Container(
+              //           margin: EdgeInsets.only(
+              //             left: 18.0,
+              //           ),
+              //           decoration: BoxDecoration(
+              //             color: Colors.white,
+              //             borderRadius: BorderRadius.circular(10),
+              //           ),
+              //           child: TextField(
+              //             controller: firstName,
+              //             decoration: InputDecoration(
+              //               prefixIcon: Icon(
+              //                 Icons.person,
+              //                 color: Colors.black,
+              //               ),
+              //               hintText: 'First name',
+              //               focusedBorder: OutlineInputBorder(
+              //                 borderSide: BorderSide(
+              //                     color: Colors.white), // Set border color
+              //                 borderRadius: BorderRadius.circular(40.0),
+              //               ),
+              //               enabledBorder: OutlineInputBorder(
+              //                 borderSide: BorderSide(
+              //                     color: Colors.white), // Set border color
+              //                 borderRadius: BorderRadius.circular(40.0),
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       SizedBox(width: 5),
+              //       Expanded(
+              //         flex: 2,
+              //         child: Container(
+              //           margin: EdgeInsets.only(
+              //             right: 18.0,
+              //           ),
+              //           decoration: BoxDecoration(
+              //             color: Colors.white,
+              //             borderRadius: BorderRadius.circular(10),
+              //           ),
+              //           child: TextField(
+              //             controller: lastName,
+              //             decoration: InputDecoration(
+              //               prefixIcon: Icon(
+              //                 Icons.people_alt,
+              //                 color: Colors.black,
+              //               ),
+              //               hintText: 'Last name',
+              //               focusedBorder: OutlineInputBorder(
+              //                 borderSide: BorderSide(
+              //                     color: Colors.white), // Set border color
+              //                 borderRadius: BorderRadius.circular(40.0),
+              //               ),
+              //               enabledBorder: OutlineInputBorder(
+              //                 borderSide: BorderSide(
+              //                     color: Colors.white), // Set border color
+              //                 borderRadius: BorderRadius.circular(40.0),
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
 
+              SizedBox(height: 5),
               Container(
                 margin: EdgeInsets.only(
                   left: 18.0,
@@ -186,40 +262,37 @@ class _SignUpPageState extends State<SignUpPage> {
                       )),
                 ),
               ),
-              SizedBox(height: w * 0.08),
+              SizedBox(height: w * 0.05),
+              // Center(
+              //   child: Text(
+              //     "Sign up using one of the following methods",
+              //     style: TextStyle(
+              //       fontSize: 15,
+              //       color: Colors.white,
+              //       //fontWeight: FontWeight.bold
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(
+              //   height: 5,
+              // ),
               Center(
-                child: Text(
-                  "Sign up using one of the following methods",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white,
-                    //fontWeight: FontWeight.bold
+                child: GestureDetector(
+                  onTap: () {
+                    AuthService().signInWithGoogle(context, (String email) {});
+                  },
+                  child: CircleAvatar(
+                    radius: 25,
+                    // ignore: prefer_interpolation_to_compose_strings
+                    backgroundImage:
+                        AssetImage('assets/img/google_logo.png'), //! google
+                    backgroundColor: Colors.white,
                   ),
                 ),
               ),
+
               SizedBox(
-                height: 5,
-              ),
-              Center(
-                  child: Wrap(
-                children: List.generate(3, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CircleAvatar(
-                        radius: 25,
-                        // backgroundColor: hexToColor("A17639"),
-                        child: CircleAvatar(
-                          radius: 25,
-                          // ignore: prefer_interpolation_to_compose_strings
-                          backgroundImage:
-                              AssetImage('assets/img/' + images[index]),
-                          backgroundColor: Colors.white,
-                        )),
-                  );
-                }),
-              )),
-              SizedBox(
-                height: h * 0.01,
+                height: 10,
               ),
               Center(
                 child: RichText(
@@ -234,10 +307,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
-              // Add other widgets here
-              // For example:
-              // TextField(controller: emailController),
-              // TextField(controller: passwordController),
             ],
           ),
         ),

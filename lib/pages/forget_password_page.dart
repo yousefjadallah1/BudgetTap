@@ -64,7 +64,7 @@ class _SignInPageState extends State<ForgetPassword> {
     //double h = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: hexToColor("C9C9C9"),
+      backgroundColor: Colors.black,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -85,7 +85,7 @@ class _SignInPageState extends State<ForgetPassword> {
                     "RESET PASSWORD",
                     style: TextStyle(
                       fontSize: 48,
-                      color: Colors.black,
+                      color: Colors.white,
                       fontFamily: GoogleFonts.bebasNeue().fontFamily,
                     ),
                   ),
@@ -101,7 +101,7 @@ class _SignInPageState extends State<ForgetPassword> {
                     "Enter your email and we will send you a password rest link",
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.black,
+                      color: Colors.white,
                       // fontFamily: GoogleFonts.bebasNeue().fontFamily,
                     ),
                     textAlign: TextAlign.center,
@@ -152,7 +152,7 @@ class _SignInPageState extends State<ForgetPassword> {
                       height: 50,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                       child: Center(
                         child: Text(
@@ -160,7 +160,7 @@ class _SignInPageState extends State<ForgetPassword> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
-                              color: Colors.white),
+                              color: Colors.black),
                         ),
                       )),
                 ),

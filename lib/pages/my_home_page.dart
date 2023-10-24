@@ -1,15 +1,18 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:budgettap/Widgets/drawer.dart';
 import 'package:budgettap/pages/dms_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_metadata/font_awesome_metadata.dart';
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyHomePage extends StatefulWidget {
-  final String email;
+  final String uid;
 
-  MyHomePage({Key? key, required this.email}) : super(key: key);
+  MyHomePage({Key? key, required this.uid}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -24,29 +27,31 @@ class _MyHomePageState extends State<MyHomePage> {
     double h = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: false,
-        title: Text(widget.email, style: TextStyle(fontSize: 25)),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.grey[900],
+        centerTitle: true,
+        title: Text("Budget", style: TextStyle(fontSize: 25)),
         actions: [
           IconButton(
-            //! Notifications
+            //! signout
             onPressed: () {},
-            icon: const Icon(FontAwesomeIcons.heart),
-          ),
-          IconButton(
-            // ! DMs
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DMsPage()),
-              );
-            },
-            icon: const Icon(Icons.abc),
+            icon: const Icon(FontAwesomeIcons.arrowRightFromBracket),
           ),
         ],
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // Open the drawer
+              },
+            );
+          },
+        ),
       ),
+      drawer: MyDrawer(),
       body: Column(
         children: <Widget>[
           Container(
@@ -54,17 +59,17 @@ class _MyHomePageState extends State<MyHomePage> {
             height: h * 0.3,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-              color: Colors.black,
+              color: Colors.transparent,
             ),
-            child: Text(widget.email,
-                style: TextStyle(fontSize: 25, color: Colors.white)),
+            child: Text(widget.uid,
+                style: TextStyle(fontSize: 15, color: Colors.black)),
           ),
           Container(
             width: w,
             height: h * 0.3,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-              color: Colors.black,
+              color: Colors.transparent,
             ),
           ),
           Align(

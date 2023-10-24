@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">BudgeTtap</string>
+<string name="facebook_app_id">1262677087777761</string>
+<string name="fb_login_protocol_scheme">1e9253443dbb20c05c05ac4e0cb476a8</string>
+<string name="facebook_client_token">a4dd06f3551f81c1e165513b3c8cdf50</string>
+</resources>
