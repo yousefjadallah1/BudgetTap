@@ -2,6 +2,7 @@
 
 import 'package:budgettap/Widgets/drawer.dart';
 import 'package:budgettap/pages/dms_page.dart';
+import 'package:budgettap/pages/profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_metadata/font_awesome_metadata.dart';
@@ -21,6 +22,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   AuthController authController = Get.find();
 
+  void signout() {
+    authController.logout();
+  }
+
+  void goToProfilePage() {
+    Navigator.pop(context);
+    Get.to(() => ProfilePage());
+  }
+
+  void goToHome() {
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
@@ -33,13 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.grey[900],
         centerTitle: true,
         title: Text("Budget", style: TextStyle(fontSize: 25)),
-        actions: [
-          IconButton(
-            //! signout
-            onPressed: () {},
-            icon: const Icon(FontAwesomeIcons.arrowRightFromBracket),
-          ),
-        ],
+        actions: [],
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
@@ -51,7 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
       ),
-      drawer: MyDrawer(),
+      drawer: MyDrawer(
+        onProfileTap: goToProfilePage,
+        onSingOutTap: signout,
+        onHomePageTap: goToHome,
+      ),
       body: Column(
         children: <Widget>[
           Container(
@@ -63,40 +75,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             child: Text(widget.uid,
                 style: TextStyle(fontSize: 15, color: Colors.black)),
-          ),
-          Container(
-            width: w,
-            height: h * 0.3,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: Colors.transparent,
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              onTap: () {
-                authController.logout();
-              },
-              child: Container(
-                width: w * 0.5,
-                height: h * 0.07,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Colors.white,
-                ),
-                child: Center(
-                  child: Text(
-                    'Sign out',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ),
         ],
       ),

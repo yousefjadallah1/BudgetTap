@@ -30,7 +30,7 @@ class _SignUpPageState extends State<SignUpPage> {
   var passwordController = TextEditingController();
   var reEnterPasswordController = TextEditingController();
   var firstName = TextEditingController();
-  var lastName = TextEditingController();
+  var nameController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
@@ -65,79 +65,36 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               SizedBox(height: 15),
-              // Container(
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       Expanded(
-              //         flex: 2,
-              //         child: Container(
-              //           margin: EdgeInsets.only(
-              //             left: 18.0,
-              //           ),
-              //           decoration: BoxDecoration(
-              //             color: Colors.white,
-              //             borderRadius: BorderRadius.circular(10),
-              //           ),
-              //           child: TextField(
-              //             controller: firstName,
-              //             decoration: InputDecoration(
-              //               prefixIcon: Icon(
-              //                 Icons.person,
-              //                 color: Colors.black,
-              //               ),
-              //               hintText: 'First name',
-              //               focusedBorder: OutlineInputBorder(
-              //                 borderSide: BorderSide(
-              //                     color: Colors.white), // Set border color
-              //                 borderRadius: BorderRadius.circular(40.0),
-              //               ),
-              //               enabledBorder: OutlineInputBorder(
-              //                 borderSide: BorderSide(
-              //                     color: Colors.white), // Set border color
-              //                 borderRadius: BorderRadius.circular(40.0),
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       SizedBox(width: 5),
-              //       Expanded(
-              //         flex: 2,
-              //         child: Container(
-              //           margin: EdgeInsets.only(
-              //             right: 18.0,
-              //           ),
-              //           decoration: BoxDecoration(
-              //             color: Colors.white,
-              //             borderRadius: BorderRadius.circular(10),
-              //           ),
-              //           child: TextField(
-              //             controller: lastName,
-              //             decoration: InputDecoration(
-              //               prefixIcon: Icon(
-              //                 Icons.people_alt,
-              //                 color: Colors.black,
-              //               ),
-              //               hintText: 'Last name',
-              //               focusedBorder: OutlineInputBorder(
-              //                 borderSide: BorderSide(
-              //                     color: Colors.white), // Set border color
-              //                 borderRadius: BorderRadius.circular(40.0),
-              //               ),
-              //               enabledBorder: OutlineInputBorder(
-              //                 borderSide: BorderSide(
-              //                     color: Colors.white), // Set border color
-              //                 borderRadius: BorderRadius.circular(40.0),
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
 
+              Container(
+                margin: EdgeInsets.only(
+                  left: 18.0,
+                  right: 18.0,
+                ),
+                //!Name
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                      Icons.person,
+                      color: Colors.black,
+                    ),
+                    hintText: 'Name',
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black)),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.transparent, width: 1.0)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                  ),
+                ),
+              ),
               SizedBox(height: 5),
               Container(
                 margin: EdgeInsets.only(
@@ -238,6 +195,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     emailController.text.trim(),
                     passwordController.text.trim(),
                     reEnterPasswordController.text.trim(),
+                    nameController.text.trim(),
                   );
                 },
                 child: Center(
@@ -302,7 +260,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ..onTap = () => Get.to(() => SignInPage()),
                     style: TextStyle(
                         //fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18,
                         color: Colors.blue),
                   ),
                 ),

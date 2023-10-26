@@ -1,5 +1,7 @@
 import 'package:budgettap/pages/my_home_page.dart';
+import 'package:budgettap/pages/signup_page.dart';
 import 'package:budgettap/pages/welcome_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,11 +32,12 @@ class AuthController extends GetxController {
   }
 
   Future<void> register(
-    String email,
-    String password,
+    String emailConroller,
+    String passwordController,
     String reEnterPassword,
+    String nameController,
   ) async {
-    if (password != reEnterPassword) {
+    if (passwordController != reEnterPassword) {
       // Passwords do not match
       Get.snackbar(
         "Password Mismatch",
@@ -49,21 +52,21 @@ class AuthController extends GetxController {
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+        email: emailConroller,
+        password: passwordController,
       );
-
+      FirebaseFirestore.instance
+          .collection("Users")
+          .doc(userCredential.user!.email)
+          .set({
+        'Username': emailConroller.split("@")[0],
+        'Name': nameController,
+        'Balance of Checking Account': "0",
+        'Balance of Saving Account': "0",
+        'Salary per month': "0",
+      });
       // Get the user ID (UID)
       String uid = userCredential.user!.uid;
-// Store user data in Firestore
-      // await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      //   'email': email,
-      //   'firstName': firstName,
-      //   'lastName': lastName,
-      // });
-      // Registration successful
-      // You can perform any further actions after successful registration here
-      print('User registered: $uid');
 
       // Navigate to the desired screen after successful registration if needed
     } on FirebaseAuthException catch (e) {
