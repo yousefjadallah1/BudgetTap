@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
-class MyTextBox extends StatelessWidget {
+class MyTextBoxNoEdit extends StatelessWidget {
   final String text;
   final String sectionName;
-  final void Function()? onPressed;
-  const MyTextBox(
-      {super.key,
-      required this.text,
-      required this.sectionName,
-      required this.onPressed});
+  const MyTextBoxNoEdit({
+    super.key,
+    required this.text,
+    required this.sectionName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +28,14 @@ class MyTextBox extends StatelessWidget {
                 style: TextStyle(color: Colors.grey[500], fontSize: 15),
               ),
               IconButton(
-                onPressed: onPressed,
-                icon: Icon(Icons.edit_note),
-                color: Colors.grey[500],
+                onPressed: () {},
+                focusColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                disabledColor: Colors.transparent,
+                icon: Icon(Icons.lock),
+                color: Colors.transparent,
+                highlightColor: Colors.transparent,
               )
             ],
           ),

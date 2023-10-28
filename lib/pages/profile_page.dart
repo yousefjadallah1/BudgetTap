@@ -1,5 +1,6 @@
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:budgettap/Widgets/drawer.dart';
+import 'package:budgettap/Widgets/textbox_noEdit.dart';
 import 'package:budgettap/Widgets/textbox_widget.dart';
 import 'package:budgettap/pages/my_home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,6 +41,10 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey[900],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+              20.0), // Adjust the circular border radius here
+        ),
         title: Text(
           "Edit $field",
           style: TextStyle(
@@ -83,6 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    //double w = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
@@ -104,25 +110,14 @@ class _ProfilePageState extends State<ProfilePage> {
             //get user data
             if (snapshot.hasData) {
               final userData = snapshot.data!.data() as Map<String, dynamic>;
-
               return ListView(
                 children: [
-                  //profile pic
                   const SizedBox(
-                    height: 50,
+                    height: 30,
                   ),
-                  Icon(
-                    Icons.person,
-                    size: 72,
-                  ),
-                  SizedBox(height: 10),
+
                   //user email
-                  Text(
-                    currentUser!.email!,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                  SizedBox(height: 50),
+
                   //!user detial
                   Padding(
                     padding: EdgeInsets.only(left: 25),
@@ -131,13 +126,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: TextStyle(color: Colors.grey[600], fontSize: 15),
                     ),
                   ),
-                  //username
+
+                  //Name
                   MyTextBox(
                     text: userData['Name'],
                     sectionName: "Name",
                     onPressed: () => editField("Name"),
                   ),
-                  //name
+                  //email
+                  MyTextBoxNoEdit(
+                    text: currentUser!.email!,
+                    sectionName: "Email",
+                  ),
+                  //Username
                   MyTextBox(
                     text: userData['Username'],
                     sectionName: "Username",
@@ -156,12 +157,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   MyTextBox(
                     text: userData['Balance of Checking Account'],
                     sectionName: "Balance of Checking Account",
-                    onPressed: () => editField("balance for Checking Account"),
+                    onPressed: () => editField("Balance of Checking Account"),
                   ),
                   MyTextBox(
                     text: userData['Balance of Saving Account'],
                     sectionName: "Balance of Saving Account",
-                    onPressed: () => editField("balance for Saving Account"),
+                    onPressed: () => editField("Balance of Saving Account"),
                   ),
                   MyTextBox(
                     text: userData['Salary per month'],

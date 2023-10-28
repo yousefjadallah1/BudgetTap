@@ -1,5 +1,4 @@
 import 'package:budgettap/pages/my_home_page.dart';
-import 'package:budgettap/pages/signup_page.dart';
 import 'package:budgettap/pages/welcome_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -66,7 +65,7 @@ class AuthController extends GetxController {
         'Salary per month': "0",
       });
       // Get the user ID (UID)
-      String uid = userCredential.user!.uid;
+      // String uid = userCredential.user!.uid;
 
       // Navigate to the desired screen after successful registration if needed
     } on FirebaseAuthException catch (e) {
@@ -123,6 +122,7 @@ class AuthController extends GetxController {
   }
 }
 
+//!google auth
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -130,7 +130,6 @@ class AuthService {
   Future<void> signInWithGoogle(
       BuildContext context, Function(String) onEmailReceived) async {
     try {
-      // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
@@ -138,31 +137,47 @@ class AuthService {
         return;
       }
 
-      // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      // Create a new credential
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Sign in with Firebase
       UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
-      // Get the user's email address
       String? userEmail = userCredential.user?.email;
 
-      // Call the callback function with the email
+      // Check if the user already exists in Firestore
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(userEmail)
+          .get();
+
+      if (!userSnapshot.exists) {
+        // User does not exist, create a new document in Firestore
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(userEmail)
+            .set({
+          'Username': userEmail!.split("@")[0],
+          'Name': userCredential.user?.displayName ?? '',
+          'Balance of Checking Account': "0",
+          'Balance of Saving Account': "0",
+          'Salary per month': "0",
+        });
+      }
+
       onEmailReceived(userEmail!);
       String uid = userCredential.user!.uid;
 
-      // Navigate to MyHomePage
+      // Wait for Firestore operations to complete before navigating
+      await Future.delayed(
+          Duration(seconds: 2)); // Example delay, adjust as needed
       Get.off(() => MyHomePage(uid: uid));
     } catch (error) {
-      // Handle sign-in errors here
       print(error.toString());
     }
   }
