@@ -29,6 +29,7 @@ dependencies:
   u_credit_card: ^1.1.0
   flutter_credit_card: ^4.0.1
   debit_credit_card_widget: ^1.0.2
+  syncfusion_flutter_charts: ^23.1.43
   
   
  

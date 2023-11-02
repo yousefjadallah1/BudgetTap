@@ -1,3 +1,5 @@
+import 'package:budgettap/Widgets/bottomNavi.dart';
+import 'package:budgettap/pages/statistics.dart';
 import 'package:budgettap/pages/welcome_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      home: WelcomePage(),
+      home: BottomNavi(),
     );
   }
 }

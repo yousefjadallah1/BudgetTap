@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -30,9 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void goToHome() {
-    Get.off(() => MyHomePage(
-          uid: currentUser!.uid,
-        ));
+    Get.off(() => MyHomePage());
   }
 
   Future<void> editField(String field) async {
@@ -90,17 +89,13 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     //double w = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.grey[300],
-      appBar: AppBar(
-        title: Text("Profile page"),
-        centerTitle: true,
-        backgroundColor: Colors.grey[900],
-      ),
-      drawer: MyDrawer(
-        onProfileTap: goToProfilePage,
-        onSingOutTap: signout,
-        onHomePageTap: goToHome,
-      ),
+      backgroundColor: Colors.black,
+      // appBar: AppBar(
+      //   title: Text("Profile page"),
+      //   centerTitle: true,
+      //   backgroundColor: Colors.grey[900],
+      // ),
+
       body: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
               .collection("Users")
@@ -112,7 +107,16 @@ class _ProfilePageState extends State<ProfilePage> {
               final userData = snapshot.data!.data() as Map<String, dynamic>;
               return ListView(
                 children: [
-                  const SizedBox(
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text("Profile",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.abel(
+                        color: Colors.white,
+                        fontSize: 40,
+                      )),
+                  SizedBox(
                     height: 30,
                   ),
 
@@ -123,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: EdgeInsets.only(left: 25),
                     child: Text(
                       "Personal Details",
-                      style: TextStyle(color: Colors.grey[600], fontSize: 15),
+                      style: TextStyle(color: Colors.grey[300], fontSize: 17),
                     ),
                   ),
 
@@ -150,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: EdgeInsets.only(left: 25),
                     child: Text(
                       "Financial Details",
-                      style: TextStyle(color: Colors.grey[600], fontSize: 15),
+                      style: TextStyle(color: Colors.grey[300], fontSize: 17),
                     ),
                   ),
                   // balance

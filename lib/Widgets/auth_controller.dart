@@ -1,3 +1,4 @@
+import 'package:budgettap/Widgets/bottomNavi.dart';
 import 'package:budgettap/pages/my_home_page.dart';
 import 'package:budgettap/pages/welcome_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,7 +27,7 @@ class AuthController extends GetxController {
       print("Login page");
       Get.off(() => WelcomePage());
     } else {
-      Get.off(() => MyHomePage(uid: user.uid));
+      Get.off(() => BottomNavi());
     }
   }
 
@@ -176,7 +177,7 @@ class AuthService {
       // Wait for Firestore operations to complete before navigating
       await Future.delayed(
           Duration(seconds: 2)); // Example delay, adjust as needed
-      Get.off(() => MyHomePage(uid: uid));
+      Get.off(() => BottomNavi());
     } catch (error) {
       print(error.toString());
     }
