@@ -1,7 +1,9 @@
 import 'package:budgettap/Widgets/auth_controller.dart';
+import 'package:budgettap/pages/add_page.dart';
 import 'package:budgettap/pages/my_home_page.dart';
 import 'package:budgettap/pages/profile_page.dart';
 import 'package:budgettap/pages/statistics.dart';
+import 'package:budgettap/pages/transactions_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,18 +20,20 @@ class BottomNavi extends StatefulWidget {
 }
 
 class _BottomNaviState extends State<BottomNavi> {
-  int index_color = 0;
+  int index_color1 = 0;
   final currentUser = FirebaseAuth.instance.currentUser;
   AuthController authController = Get.find();
 
-  List screens = [MyHomePage(), Statistics(), Statistics(), ProfilePage()];
+  List screens = [MyHomePage(), Statistics(), Transactions(), ProfilePage()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: screens[index_color],
+      body: screens[index_color1],
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Get.to(() => AddPage());
+        },
         child: Icon(
           Icons.add,
           color: Colors.black,
@@ -48,49 +52,49 @@ class _BottomNaviState extends State<BottomNavi> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    index_color = 0;
+                    index_color1 = 0;
                   });
                 },
                 child: Icon(
                   Icons.home,
                   size: 30,
-                  color: index_color == 0 ? hexToColor("FFD700") : Colors.grey,
+                  color: index_color1 == 0 ? hexToColor("FFD700") : Colors.grey,
                 ),
               ),
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    index_color = 1;
+                    index_color1 = 1;
                   });
                 },
                 child: Icon(
                   Icons.bar_chart_outlined,
                   size: 30,
-                  color: index_color == 1 ? hexToColor("FFD700") : Colors.grey,
+                  color: index_color1 == 1 ? hexToColor("FFD700") : Colors.grey,
                 ),
               ),
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    index_color = 2;
+                    index_color1 = 2;
                   });
                 },
                 child: Icon(
-                  Icons.account_balance_wallet_outlined,
+                  Icons.swap_horiz,
                   size: 30,
-                  color: index_color == 2 ? hexToColor("FFD700") : Colors.grey,
+                  color: index_color1 == 2 ? hexToColor("FFD700") : Colors.grey,
                 ),
               ),
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    index_color = 3;
+                    index_color1 = 3;
                   });
                 },
                 child: Icon(
                   Icons.person,
                   size: 30,
-                  color: index_color == 3 ? hexToColor("FFD700") : Colors.grey,
+                  color: index_color1 == 3 ? hexToColor("FFD700") : Colors.grey,
                 ),
               ),
             ],

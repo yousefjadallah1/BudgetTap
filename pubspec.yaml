@@ -55,6 +55,7 @@ flutter:
   assets:
     - assets/img/
     - assets/animation/
+    - assets/addings/
   fonts:
     - family: Billabong
       fonts:

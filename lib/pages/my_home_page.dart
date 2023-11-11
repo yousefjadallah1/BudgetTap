@@ -1,5 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-import 'package:budgettap/Widgets/money_data.dart';
+import 'package:budgettap/Widgets/bottomNavi.dart';
 import 'package:budgettap/Widgets/drawer.dart';
 import 'package:budgettap/pages/profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:budgettap/pages/transactions_page.dart';
 
 Color hexToColor(String hexCode) {
   return Color(int.parse(hexCode, radix: 16) + 0xFF000000);
@@ -157,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 top: 50,
                 left: 20,
                 child: Text(
-                  '\$ 1,199,924', // Your Visa logo asset
+                  '\$ ${userData['Balance of Checking Account']}', // Your Visa logo asset
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
@@ -192,18 +193,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget buildTransactions() {
     //double w = MediaQuery.of(context).size.width;
-    double h = MediaQuery.of(context).size.height;
+    //double h = MediaQuery.of(context).size.height;
 
     return CustomScrollView(
       slivers: [
-        // SliverToBoxAdapter(
-        //   child: SizedBox(
-        //     height: h * 0.37,
-        //   ),
-        // ),
-        // SliverToBoxAdapter(
-        //   child: SizedBox(height: h * 0.25, child: buildCreditCardSection()),
-        // ),
         SliverToBoxAdapter(
           //!transaction
           child: Container(
@@ -239,54 +232,63 @@ class _MyHomePageState extends State<MyHomePage> {
                         fontSize: 22,
                         fontWeight: FontWeight.w500),
                   ),
-                  Text(
-                    "See all",
-                    style: TextStyle(
-                        color: Colors.grey[300],
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal),
-                  ),
                 ],
               ),
             ),
           ),
         ),
-        SliverList(
-            delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            return ListTile(
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: Image.asset(
-                  geter()[index].image!,
-                  height: 50,
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection("Users")
+              .doc(currentUser!.email)
+              .collection("Transactions")
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<QueryDocumentSnapshot> transactions = snapshot.data!.docs;
+
+              return SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    var transaction =
+                        transactions[index].data() as Map<String, dynamic>;
+
+                    return ListTile(
+                      leading: Image.asset(
+                          "assets/addings/${transaction['name']}.png"),
+                      title: Text(
+                        transaction['name'],
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(
+                        transaction['date'].toString(),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      trailing: Text(
+                        transaction['amount'].toString(),
+                        style: TextStyle(
+                          color: transaction['buy'] ? Colors.green : Colors.red,
+                          fontSize: 19,
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: transactions.length,
                 ),
-              ),
-              title: Text(
-                geter()[index].name!,
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white),
-              ),
-              subtitle: Text(
-                geter()[index].time!,
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[400]),
-              ),
-              trailing: Text(
-                geter()[index].fee!,
-                style: TextStyle(
-                  color: geter()[index].buy! ? Colors.red : Colors.green,
-                  fontSize: 19,
+              );
+            } else if (snapshot.hasError) {
+              return SliverToBoxAdapter(
+                child: Center(
+                  child: Text('Error ${snapshot.error.toString()}'),
                 ),
-              ),
-            );
+              );
+            } else {
+              return SliverToBoxAdapter(
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
           },
-          childCount: geter().length,
-        ))
+        ),
       ],
     );
   }
@@ -324,12 +326,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
               .collection("Users")
-              .doc(currentUser!.email)
+              .doc(currentUser?.email)
               .snapshots(),
           builder: (context, snapshot) {
             //get user data
             if (snapshot.hasData) {
-              userData = snapshot.data!.data() as Map<String, dynamic>;
+              userData = snapshot.data?.data() as Map<String, dynamic>;
               return SafeArea(
                 child: Stack(
                   children: [
