@@ -2,13 +2,13 @@
 
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:budgettap/Widgets/bottomNavi.dart';
-import 'package:budgettap/Widgets/money_data.dart';
-import 'package:budgettap/pages/my_home_page.dart';
+import 'package:budgettap/pages/loading_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 Color hexToColor(String hexCode) {
   return Color(int.parse(hexCode, radix: 16) + 0xFF000000);
@@ -79,6 +79,34 @@ class _AddState extends State<AddPage> {
       'buy': buy,
     };
 
+    // Show loading screen while saving
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.transparent,
+          content: Center(
+            child: LoadingAnimationWidget.flickr(
+              leftDotColor: Colors.white,
+              rightDotColor: hexToColor("FFD700"),
+              size: 100,
+            ),
+          ),
+        );
+      },
+    );
+    //String? currentBalanceString = userData['Balance of Checking Account'];
+    double currentBalance = userData['Balance of Checking Account'];
+
+    if (buy == true) {
+      double transactionAmount = double.parse(amountController.text);
+      currentBalance += transactionAmount;
+    } else {
+      double transactionAmount = double.parse(amountController.text);
+      currentBalance -= transactionAmount;
+    }
+
     // Update Firestore with the transaction data
     await FirebaseFirestore.instance
         .collection("Users")
@@ -86,7 +114,11 @@ class _AddState extends State<AddPage> {
         .collection("Transactions")
         .add(transData);
 
-    // Optionally, you can clear the input fields after saving
+    // Update the balance in Firestore
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .update({'Balance of Checking Account': currentBalance});
     setState(() {
       selectedItem = null;
       selectedItem2 = null;
@@ -128,7 +160,7 @@ class _AddState extends State<AddPage> {
                 child: Text('Error ${snapshot.error.toString()}'),
               );
             }
-            return const Center(child: CircularProgressIndicator());
+            return LoadingScreen();
           }),
     );
   }

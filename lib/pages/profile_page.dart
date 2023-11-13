@@ -1,7 +1,7 @@
 import 'package:budgettap/Widgets/auth_controller.dart';
-import 'package:budgettap/Widgets/drawer.dart';
 import 'package:budgettap/Widgets/textbox_noEdit.dart';
 import 'package:budgettap/Widgets/textbox_widget.dart';
+import 'package:budgettap/pages/loading_page.dart';
 import 'package:budgettap/pages/my_home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -85,6 +85,71 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> editFieldDouble(String field) async {
+    double newValue = 0.0;
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+              20.0), // Adjust the circular border radius here
+        ),
+        title: Text(
+          "Edit $field",
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        content: TextField(
+          style: TextStyle(
+            color: Colors.white,
+          ),
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: "Enter new $field",
+            hintStyle: TextStyle(color: Colors.grey),
+          ),
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              try {
+                // Attempt to parse the value as a double
+                double parsedValue = double.parse(value);
+
+                // Use the parsed value for further processing
+                newValue = parsedValue;
+              } catch (e) {
+                // Handle the case where parsing fails (e.g., invalid input)
+                print('Error parsing double: $e');
+              }
+            } else {
+              // Handle the case where the value is empty
+              print('Input is empty');
+            }
+          },
+        ),
+        actions: [
+          //cancel
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("Cancel", style: TextStyle(color: Colors.white)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(newValue);
+            },
+            child: Text("Save", style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
+    );
+    if (newValue > -900000000) {
+      await userCollections.doc(currentUser!.email).update({field: newValue});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     //double w = MediaQuery.of(context).size.width;
@@ -159,19 +224,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   // balance
                   MyTextBox(
-                    text: userData['Balance of Checking Account'],
+                    text: userData['Balance of Checking Account'].toString(),
                     sectionName: "Balance of Checking Account",
-                    onPressed: () => editField("Balance of Checking Account"),
+                    onPressed: () =>
+                        editFieldDouble("Balance of Checking Account"),
                   ),
                   MyTextBox(
-                    text: userData['Balance of Saving Account'],
+                    text: userData['Balance of Saving Account'].toString(),
                     sectionName: "Balance of Saving Account",
-                    onPressed: () => editField("Balance of Saving Account"),
+                    onPressed: () =>
+                        editFieldDouble("Balance of Saving Account"),
                   ),
                   MyTextBox(
-                    text: userData['Salary per month'],
+                    text: userData['Salary per month'].toString(),
                     sectionName: "Salary per month",
-                    onPressed: () => editField("Salary"),
+                    onPressed: () => editFieldDouble("Salary"),
                   ),
                   SizedBox(height: 20),
                 ],
@@ -181,7 +248,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Text('Error ${snapshot.error.toString()}'),
               );
             }
-            return const Center(child: CircularProgressIndicator());
+            return LoadingScreen();
           }),
     );
   }

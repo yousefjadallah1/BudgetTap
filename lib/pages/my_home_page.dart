@@ -1,13 +1,12 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-import 'package:budgettap/Widgets/bottomNavi.dart';
 import 'package:budgettap/Widgets/drawer.dart';
+import 'package:budgettap/pages/loading_page.dart';
 import 'package:budgettap/pages/profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:budgettap/pages/transactions_page.dart';
 
 Color hexToColor(String hexCode) {
   return Color(int.parse(hexCode, radix: 16) + 0xFF000000);
@@ -25,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
   AuthController authController = Get.find();
   final currentUser = FirebaseAuth.instance.currentUser;
   //final userName = FirebaseFirestore.instance.collection("Users").doc(currentUser!.email).
-  Map<String, dynamic> userData = {}; // Declare userData here
+  Map<String, dynamic>? userData = {}; // Declare userData here
   void signout() {
     authController.logout();
   }
@@ -158,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 top: 50,
                 left: 20,
                 child: Text(
-                  '\$ ${userData['Balance of Checking Account']}', // Your Visa logo asset
+                  '\$ ${userData?['Balance of Checking Account']}', // Your Visa logo asset
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
@@ -168,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
               bottom: 20,
               left: 20,
               child: Text(
-                userData['Name'],
+                userData?['Name'],
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -300,60 +299,49 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       backgroundColor: hexToColor("000000"),
-      // appBar: AppBar(
-      //   automaticallyImplyLeading: false,
-      //   backgroundColor: Colors.transparent,
-      //   centerTitle: true,
-      //   title: Text("BudgetTap",
-      //       style: TextStyle(fontSize: 35, fontFamily: 'Billabong')),
-      //   actions: [],
-      //   leading: Builder(
-      //     builder: (BuildContext context) {
-      //       return IconButton(
-      //         icon: Icon(Icons.menu),
-      //         onPressed: () {
-      //           Scaffold.of(context).openDrawer(); // Open the drawer
-      //         },
-      //       );
-      //     },
-      //   ),
-      // ),
       drawer: MyDrawer(
         onProfileTap: goToProfilePage,
         onSingOutTap: signout,
         onHomePageTap: goToHome,
       ),
       body: StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection("Users")
-              .doc(currentUser?.email)
-              .snapshots(),
-          builder: (context, snapshot) {
-            //get user data
-            if (snapshot.hasData) {
-              userData = snapshot.data?.data() as Map<String, dynamic>;
-              return SafeArea(
-                child: Stack(
-                  children: [
-                    buildHeader(),
-                    buildCreditCardSection(),
-                    Positioned(
-                      top: MediaQuery.of(context).size.height * 0.39,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: buildTransactions(),
-                    ),
-                  ],
-                ),
-              ); //! end
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error ${snapshot.error.toString()}'),
-              );
-            }
-            return const Center(child: CircularProgressIndicator());
-          }),
+        stream: FirebaseFirestore.instance
+            .collection("Users")
+            .doc(currentUser?.email)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Show loading screen while waiting for data
+            return LoadingScreen();
+          } else if (snapshot.hasError) {
+            // Handle error
+            return Center(
+              child: Text('Error ${snapshot.error.toString()}'),
+            );
+          } else if (snapshot.hasData && snapshot.data!.exists) {
+            // Check if the document exists before accessing its fields
+            userData = snapshot.data!.data() as Map<String, dynamic>;
+            return SafeArea(
+              child: Stack(
+                children: [
+                  buildHeader(),
+                  buildCreditCardSection(),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.39,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: buildTransactions(),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            // Handle the case where there is no data or some fields are missing
+            return LoadingScreen();
+          }
+        },
+      ),
     );
   }
 }

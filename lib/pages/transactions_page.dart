@@ -1,4 +1,4 @@
-import 'package:budgettap/Widgets/money_data.dart';
+import 'package:budgettap/pages/loading_page.dart';
 import 'package:budgettap/pages/signup_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -129,8 +129,9 @@ class _TransactionsState extends State<Transactions> {
                           ),
                         );
                       } else {
-                        return SliverToBoxAdapter(
-                          child: Center(child: CircularProgressIndicator()),
+                        return SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: LoadingScreen(),
                         );
                       }
                     },
@@ -143,7 +144,7 @@ class _TransactionsState extends State<Transactions> {
               child: Text('Error ${snapshot.error.toString()}'),
             );
           }
-          return const Center(child: CircularProgressIndicator());
+          return LoadingScreen();
         },
       ),
     );

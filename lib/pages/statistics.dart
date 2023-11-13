@@ -3,6 +3,7 @@
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:budgettap/Widgets/chart.dart';
 import 'package:budgettap/Widgets/money_data.dart';
+import 'package:budgettap/pages/loading_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -198,7 +199,7 @@ class _StatisticsState extends State<Statistics> {
                 child: Text('Error ${snapshot.error.toString()}'),
               );
             }
-            return const Center(child: CircularProgressIndicator());
+            return LoadingScreen();
           }),
     );
   }

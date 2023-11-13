@@ -60,9 +60,9 @@ class AuthController extends GetxController {
           .set({
         'Username': emailConroller.split("@")[0],
         'Name': nameController,
-        'Balance of Checking Account': 0,
-        'Balance of Saving Account': 0,
-        'Salary per month': "0",
+        'Balance of Checking Account': 0.0,
+        'Balance of Saving Account': 0.0,
+        'Salary per month': 0.0,
       });
       // Get the user ID (UID)
       // String uid = userCredential.user!.uid;
@@ -164,14 +164,14 @@ class AuthService {
             .set({
           'Username': userEmail!.split("@")[0],
           'Name': userCredential.user?.displayName ?? '',
-          'Balance of Checking Account': 0,
-          'Balance of Saving Account': 0,
-          'Salary per month': "0",
+          'Balance of Checking Account': 0.0,
+          'Balance of Saving Account': 0.0,
+          'Salary per month': 0.0,
         });
       }
 
       onEmailReceived(userEmail!);
-      // String uid = userCredential.user!.uid;
+      //String uid = userCredential.user!.uid;
 
       // Wait for Firestore operations to complete before navigating
       await Future.delayed(

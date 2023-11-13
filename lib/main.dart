@@ -1,5 +1,6 @@
 import 'package:budgettap/Widgets/bottomNavi.dart';
 import 'package:budgettap/pages/transactions_page.dart';
+import 'package:budgettap/pages/welcome_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,14 +16,10 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      home: BottomNavi(),
-      getPages: [
-        GetPage(name: '/pages/transactions', page: () => Transactions()),
-        // Add other pages as needed
-      ],
+      home: WelcomePage(),
     );
   }
 }
