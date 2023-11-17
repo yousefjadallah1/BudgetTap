@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sized_box_for_whitespace, avoid_unnecessary_containers, sort_child_properties_last
 
 import 'package:budgettap/Widgets/auth_controller.dart';
-import 'package:budgettap/Widgets/bottomNavi.dart';
 import 'package:budgettap/pages/loading_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,9 +25,12 @@ class _AddState extends State<AddPage> {
   final currentUser = FirebaseAuth.instance.currentUser;
   Map<String, dynamic> userData = {}; //! userData here
   Map<String, dynamic> transData = {}; //! transData here
+  Map<String, dynamic> transDataForOtherAccount =
+      {}; //! this for trans to other account
 
   String? selectedItem;
   String? selectedItem2;
+  String? selectedItem3;
   bool? buy;
   DateTime date = DateTime.now();
   String? formattedDate;
@@ -38,15 +40,29 @@ class _AddState extends State<AddPage> {
   final TextEditingController amountController = TextEditingController();
   FocusNode _amount = FocusNode();
   final List<String> _item = [
+    "Transfer between accounts",
     "Food",
     "Gas",
     "Gym",
+    "Clothes",
     "Transfer",
+    "Coffee",
+    "Gift",
+    "Grocerys",
+    "Laundry",
+    "Transportation",
+    "Water and Electricity",
+    "Others",
   ];
   final List<String> _item2 = [
-    "Income",
-    "Outcome",
+    "revenue",
+    "expenses",
   ];
+  final List<String> _item3 = [
+    "Current",
+    "Saving",
+  ];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -63,7 +79,6 @@ class _AddState extends State<AddPage> {
     // Validate if all required fields are filled
     if (selectedItem == null ||
         selectedItem2 == null ||
-        explainController.text.isEmpty ||
         amountController.text.isEmpty) {
       // You might want to show an error message or handle this case differently
       return;
@@ -75,7 +90,7 @@ class _AddState extends State<AddPage> {
       'how': selectedItem2,
       'explain': explainController.text,
       'amount': '\$ ${double.parse(amountController.text)}',
-      'date': formattedDate,
+      'date': Timestamp.fromDate(date),
       'buy': buy,
     };
 
@@ -97,7 +112,13 @@ class _AddState extends State<AddPage> {
       },
     );
     //String? currentBalanceString = userData['Balance of Checking Account'];
-    double currentBalance = userData['Balance of Checking Account'];
+    double currentBalance = selectedItem3 == "Current"
+        ? userData['Balance of Checking Account']
+        : userData['Balance of Saving Account'];
+
+    double transferdAccountBalance = selectedItem3 == "Current"
+        ? userData['Balance of Saving Account']
+        : userData['Balance of Checking Account'];
 
     if (buy == true) {
       double transactionAmount = double.parse(amountController.text);
@@ -107,18 +128,79 @@ class _AddState extends State<AddPage> {
       currentBalance -= transactionAmount;
     }
 
+    //?? this is for the transfer between accounts
+    if (selectedItem == "Transfer between accounts") {
+      if (buy == true) {
+        double transferAmount = double.parse(amountController.text);
+        transferdAccountBalance -= transferAmount;
+        //update the balance fot account that got the transaction
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(currentUser!.email)
+            .update(selectedItem3 == "Current"
+                ? {'Balance of Saving Account': transferdAccountBalance}
+                : {'Balance of Checking Account': transferdAccountBalance});
+        // add transaction
+        transDataForOtherAccount = {
+          'name': selectedItem,
+          'how': "revenue",
+          'explain': explainController.text,
+          'amount': '\$ ${double.parse(amountController.text)}',
+          'date': Timestamp.fromDate(date),
+          'buy': !buy!,
+        };
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(currentUser!.email)
+            .collection(selectedItem3 == "Current"
+                ? "Transactions Saving"
+                : "Transactions")
+            .add(transDataForOtherAccount);
+      } else {
+        double transactionAmount = double.parse(amountController.text);
+        transferdAccountBalance += transactionAmount;
+        //update the balance fot account that got the transaction
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(currentUser!.email)
+            .update(selectedItem3 == "Current"
+                ? {'Balance of Saving Account': transferdAccountBalance}
+                : {'Balance of Checking Account': transferdAccountBalance});
+        // add transaction
+        transDataForOtherAccount = {
+          'name': selectedItem,
+          'how': "revenue",
+          'explain': explainController.text,
+          'amount': '\$ ${double.parse(amountController.text)}',
+          'date': Timestamp.fromDate(date),
+          'buy': !buy!,
+        };
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(currentUser!.email)
+            .collection(selectedItem3 == "Current"
+                ? "Transactions Saving"
+                : "Transactions")
+            .add(transDataForOtherAccount);
+      }
+    }
+
     // Update Firestore with the transaction data
     await FirebaseFirestore.instance
         .collection("Users")
         .doc(currentUser!.email)
-        .collection("Transactions")
+        .collection(
+            selectedItem3 == "Current" ? "Transactions" : "Transactions Saving")
         .add(transData);
 
     // Update the balance in Firestore
     await FirebaseFirestore.instance
         .collection("Users")
         .doc(currentUser!.email)
-        .update({'Balance of Checking Account': currentBalance});
+        .update(selectedItem3 == "Current"
+            ? {'Balance of Checking Account': currentBalance}
+            : {'Balance of Saving Account': currentBalance});
+
     setState(() {
       selectedItem = null;
       selectedItem2 = null;
@@ -126,12 +208,13 @@ class _AddState extends State<AddPage> {
       amountController.clear();
     });
 
-    // Optionally, you can navigate to another screen or perform additional actions
-    Get.to((BottomNavi()));
+    Get.back();
+    Get.close(1);
   }
 
   @override
   Widget build(BuildContext context) {
+    selectedItem3 ??= "Current";
     return Scaffold(
       backgroundColor: Colors.black,
       body: StreamBuilder<DocumentSnapshot>(
@@ -170,11 +253,13 @@ class _AddState extends State<AddPage> {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: const Color.fromARGB(255, 31, 31, 31).withOpacity(0.9)),
-      height: 550,
+      height: 610,
       width: 350,
       child: Column(
         children: [
           SizedBox(height: 50),
+          account(),
+          SizedBox(height: 30),
           name(),
           SizedBox(height: 30),
           explain(),
@@ -193,7 +278,9 @@ class _AddState extends State<AddPage> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: hexToColor("FFD700"),
+                color: selectedItem3 == "Current"
+                    ? hexToColor("FFD700")
+                    : Colors.blue,
               ),
               width: 120,
               height: 50,
@@ -211,31 +298,100 @@ class _AddState extends State<AddPage> {
     );
   }
 
+  Padding account() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        width: 300,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(width: 2, color: Colors.white),
+        ),
+        child: DropdownButton<String>(
+          underline: Container(),
+          value: selectedItem3,
+          items: _item3
+              .map((e) => DropdownMenuItem(
+                    child: Container(
+                      child: Row(children: [
+                        Container(
+                          width: 40,
+                          child: Image.asset("assets/img/$e.png"),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(e,
+                            style: TextStyle(color: Colors.white, fontSize: 18))
+                      ]),
+                    ),
+                    value: e,
+                  ))
+              .toList(),
+          selectedItemBuilder: (BuildContext context) => _item3
+              .map((e) => Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        child: Image.asset("assets/img/$e.png"),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(e,
+                          style: TextStyle(color: Colors.white, fontSize: 18))
+                    ],
+                  ))
+              .toList(),
+          onChanged: (value) {
+            setState(() {
+              selectedItem3 = value!;
+              if (selectedItem3.toString() == 'revenue') {
+                buy = true;
+              } else {
+                buy = false;
+              }
+            });
+          },
+          hint: Text(
+            'Account',
+            style: TextStyle(color: Colors.white),
+          ),
+          dropdownColor: Color.fromARGB(255, 31, 31, 31).withOpacity(0.9),
+          isExpanded: true,
+        ),
+      ),
+    );
+  }
+
   Container date_time() {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 2, color: Colors.white)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(width: 2, color: Colors.white),
+      ),
       width: 300,
       child: TextButton(
-          onPressed: () async {
-            DateTime? newdate = await showDatePicker(
-              context: context,
-              initialDate: date,
-              firstDate: DateTime(2020),
-              lastDate: DateTime(2100),
-            );
-            if (newdate != null) {
-              setState(() {
-                date = newdate;
-                formattedDate = "${date.year} / ${date.month} / ${date.day}";
-              });
-            }
-          },
-          child: Text(
-            "Date: ${date.year} / ${date.month} / ${date.day}",
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          )),
+        onPressed: () async {
+          DateTime? newdate = await showDatePicker(
+            context: context,
+            initialDate: date,
+            firstDate: DateTime(2020),
+            lastDate: DateTime(2100),
+          );
+          if (newdate != null) {
+            setState(() {
+              date = newdate;
+              formattedDate = "${date.year} / ${date.month} / ${date.day}";
+            });
+          }
+        },
+        child: Text(
+          "Date: ${date.year} / ${date.month} / ${date.day}",
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+      ),
     );
   }
 
@@ -274,7 +430,7 @@ class _AddState extends State<AddPage> {
           onChanged: (value) {
             setState(() {
               selectedItem2 = value!;
-              if (selectedItem2.toString() == 'Income') {
+              if (selectedItem2.toString() == 'revenue') {
                 buy = true;
               } else {
                 buy = false;
@@ -282,7 +438,7 @@ class _AddState extends State<AddPage> {
             });
           },
           hint: Text(
-            'How',
+            'Source',
             style: TextStyle(color: Colors.white),
           ),
           dropdownColor: Color.fromARGB(255, 31, 31, 31).withOpacity(0.9),
@@ -330,7 +486,7 @@ class _AddState extends State<AddPage> {
           decoration: InputDecoration(
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              labelText: 'Explain',
+              labelText: 'Note',
               labelStyle: TextStyle(color: Colors.white),
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -368,7 +524,12 @@ class _AddState extends State<AddPage> {
                           width: 10,
                         ),
                         Text(e,
-                            style: TextStyle(color: Colors.white, fontSize: 18))
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize:
+                                    selectedItem == "Transfer between accounts"
+                                        ? 15
+                                        : 18))
                       ]),
                     ),
                     value: e,
@@ -385,7 +546,12 @@ class _AddState extends State<AddPage> {
                         width: 5,
                       ),
                       Text(e,
-                          style: TextStyle(color: Colors.white, fontSize: 18))
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize:
+                                  selectedItem == "Transfer between accounts"
+                                      ? 15
+                                      : 18))
                     ],
                   ))
               .toList(),
@@ -415,7 +581,7 @@ class _AddState extends State<AddPage> {
         gradient: LinearGradient(
           colors: [
             Colors.black,
-            hexToColor("FFD700"),
+            selectedItem3 == "Current" ? hexToColor("FFD700") : Colors.blue,
             Colors.black,
           ],
           begin: Alignment.center,

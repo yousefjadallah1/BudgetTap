@@ -30,17 +30,17 @@ class _BottomNaviState extends State<BottomNavi> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: screens[index_color1],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(() => AddPage());
-        },
-        child: Icon(
-          Icons.add,
-          color: Colors.black,
-        ),
-        backgroundColor: hexToColor("FFD700"),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Get.to(() => AddPage());
+      //   },
+      //   child: Icon(
+      //     Icons.add_outlined,
+      //     color: Colors.black,
+      //   ),
+      //   backgroundColor: hexToColor("FFD700"),
+      // ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: BottomAppBar(
         color: Colors.transparent,
         shape: CircularNotchedRectangle(),
@@ -56,9 +56,9 @@ class _BottomNaviState extends State<BottomNavi> {
                   });
                 },
                 child: Icon(
-                  Icons.home,
+                  index_color1 == 0 ? Icons.home : Icons.home_outlined,
                   size: 30,
-                  color: index_color1 == 0 ? hexToColor("FFD700") : Colors.grey,
+                  color: index_color1 == 0 ? Colors.white : Colors.grey,
                 ),
               ),
               GestureDetector(
@@ -68,9 +68,19 @@ class _BottomNaviState extends State<BottomNavi> {
                   });
                 },
                 child: Icon(
-                  Icons.bar_chart_outlined,
+                  index_color1 == 1 ? Icons.bar_chart : Icons.bar_chart,
                   size: 30,
-                  color: index_color1 == 1 ? hexToColor("FFD700") : Colors.grey,
+                  color: index_color1 == 1 ? Colors.white : Colors.grey,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => AddPage());
+                },
+                child: Icon(
+                  Icons.add_box_outlined,
+                  size: 40,
+                  color: Colors.white,
                 ),
               ),
               GestureDetector(
@@ -82,7 +92,7 @@ class _BottomNaviState extends State<BottomNavi> {
                 child: Icon(
                   Icons.swap_horiz,
                   size: 30,
-                  color: index_color1 == 2 ? hexToColor("FFD700") : Colors.grey,
+                  color: index_color1 == 2 ? Colors.white : Colors.grey,
                 ),
               ),
               GestureDetector(
@@ -92,9 +102,9 @@ class _BottomNaviState extends State<BottomNavi> {
                   });
                 },
                 child: Icon(
-                  Icons.person,
+                  index_color1 == 3 ? Icons.person : Icons.person_outlined,
                   size: 30,
-                  color: index_color1 == 3 ? hexToColor("FFD700") : Colors.grey,
+                  color: index_color1 == 3 ? Colors.white : Colors.grey,
                 ),
               ),
             ],

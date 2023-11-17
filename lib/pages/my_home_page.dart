@@ -22,9 +22,12 @@ class MyHomePage extends StatefulWidget {
 //!--------------------------------------------------------------------
 class _MyHomePageState extends State<MyHomePage> {
   AuthController authController = Get.find();
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final currentUser = FirebaseAuth.instance.currentUser;
   //final userName = FirebaseFirestore.instance.collection("Users").doc(currentUser!.email).
-  Map<String, dynamic>? userData = {}; // Declare userData here
+  Map<String, dynamic>? userData = {};
+  List accounts = ["Current", "Saving"];
+  int accountState = 0;
   void signout() {
     authController.logout();
   }
@@ -54,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Colors.black,
                 Colors.black,
                 Colors.black,
-                hexToColor("FFD700"),
+                accountState == 0 ? hexToColor("FFD700") : Colors.blue,
               ],
               begin: Alignment.center,
               end: Alignment.bottomCenter,
@@ -72,17 +75,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(7),
                   child: Container(
-                    //! notification
+                    //! settings
                     width: 40,
                     height: 40,
                     color: Colors.transparent,
-                    child: GestureDetector(
-                      onTap: () => signout(),
-                      child: Icon(
-                        Icons.logout,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.notifications,
                         size: 30,
                         color: Colors.white,
                       ),
+                      onPressed: () {
+                        scaffoldKey.currentState?.openEndDrawer();
+                      },
                     ),
                   ),
                 ),
@@ -108,6 +113,41 @@ class _MyHomePageState extends State<MyHomePage> {
         SizedBox(
           height: 20,
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ...List.generate(2, (index) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      accountState = index;
+                    });
+                  },
+                  child: Container(
+                    height: 40,
+                    width: 180,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: accountState == index
+                          ? index == 0
+                              ? hexToColor("FFD700")
+                              : Colors.blue
+                          : Colors.grey,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      accounts[index],
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                );
+              })
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -117,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
     double h = MediaQuery.of(context).size.height;
 
     return Positioned(
-      top: h * 0.135,
+      top: h * 0.195,
       left: w * 0.05,
       right: w * 0.05,
       child: Container(
@@ -190,6 +230,84 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget buildCreditCardSectionSaving() {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+
+    return Positioned(
+      top: h * 0.195,
+      left: w * 0.05,
+      right: w * 0.05,
+      child: Container(
+        width: 370,
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          gradient: LinearGradient(
+            colors: [
+              Colors.black,
+              Colors.blue,
+              Colors.black,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 12.0,
+              offset: Offset(0, 5),
+              spreadRadius: 6,
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+                top: 30,
+                left: 20,
+                child: Text(
+                  'Total Balance', // Your Visa logo asset
+                  style: TextStyle(color: Colors.white, fontSize: 17),
+                )),
+            Positioned(
+                //!total balance
+                top: 50,
+                left: 20,
+                child: Text(
+                  '\$ ${userData?['Balance of Saving Account']}', // Your Visa logo asset
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                )),
+            Positioned(
+              bottom: 20,
+              left: 20,
+              child: Text(
+                userData?['Name'],
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: Image.asset(
+                'assets/img/visa.png', // Your Visa logo asset
+                width: 60,
+                height: 30,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget buildTransactions() {
     //double w = MediaQuery.of(context).size.width;
     //double h = MediaQuery.of(context).size.height;
@@ -204,7 +322,7 @@ class _MyHomePageState extends State<MyHomePage> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  hexToColor("FFD700"),
+                  accountState == 0 ? hexToColor("FFD700") : Colors.blue,
                   Colors.black,
                   Colors.black,
                   Colors.black,
@@ -240,7 +358,9 @@ class _MyHomePageState extends State<MyHomePage> {
           stream: FirebaseFirestore.instance
               .collection("Users")
               .doc(currentUser!.email)
-              .collection("Transactions")
+              .collection(
+                  accountState == 0 ? "Transactions" : "Transactions Saving")
+              .orderBy('date', descending: true)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -260,7 +380,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: TextStyle(color: Colors.white),
                       ),
                       subtitle: Text(
-                        transaction['date'].toString(),
+                        formatTransactionDate(transaction['date'].toDate()),
                         style: TextStyle(color: Colors.white),
                       ),
                       trailing: Text(
@@ -292,6 +412,26 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  String formatTransactionDate(DateTime transactionDate) {
+    DateTime now = DateTime.now();
+    DateTime yesterday = DateTime.now().subtract(Duration(days: 1));
+
+    if (transactionDate.year == now.year &&
+        transactionDate.month == now.month &&
+        transactionDate.day == now.day) {
+      // It's today
+      return 'Today';
+    } else if (transactionDate.year == yesterday.year &&
+        transactionDate.month == yesterday.month &&
+        transactionDate.day == yesterday.day) {
+      // It's yesterday
+      return 'Yesterday';
+    } else {
+      // It's a different day, format it as 'yyyy/MM/dd'
+      return '${transactionDate.year} / ${transactionDate.month} / ${transactionDate.day}';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // double w = MediaQuery.of(context).size.width;
@@ -299,7 +439,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       backgroundColor: hexToColor("000000"),
-      drawer: MyDrawer(
+      key: scaffoldKey,
+      endDrawer: MyDrawer(
         onProfileTap: goToProfilePage,
         onSingOutTap: signout,
         onHomePageTap: goToHome,
@@ -325,9 +466,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Stack(
                 children: [
                   buildHeader(),
-                  buildCreditCardSection(),
+                  accountState == 0
+                      ? buildCreditCardSection()
+                      : buildCreditCardSectionSaving(),
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.39,
+                    top: MediaQuery.of(context).size.height * 0.45,
                     left: 0,
                     right: 0,
                     bottom: 0,

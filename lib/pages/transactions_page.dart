@@ -20,6 +20,28 @@ class _TransactionsState extends State<Transactions> {
   final currentUser = FirebaseAuth.instance.currentUser;
   //final userName = FirebaseFirestore.instance.collection("Users").doc(currentUser!.email).
   Map<String, dynamic> userData = {};
+  List accounts = ["Current", "Saving"];
+  int accountState = 0;
+  String formatTransactionDate(DateTime transactionDate) {
+    DateTime now = DateTime.now();
+    DateTime yesterday = DateTime.now().subtract(Duration(days: 1));
+
+    if (transactionDate.year == now.year &&
+        transactionDate.month == now.month &&
+        transactionDate.day == now.day) {
+      // It's today
+      return 'Today';
+    } else if (transactionDate.year == yesterday.year &&
+        transactionDate.month == yesterday.month &&
+        transactionDate.day == yesterday.day) {
+      // It's yesterday
+      return 'Yesterday';
+    } else {
+      // It's a different day, format it as 'yyyy/MM/dd'
+      return '${transactionDate.year} / ${transactionDate.month} / ${transactionDate.day}';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +77,9 @@ class _TransactionsState extends State<Transactions> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                hexToColor("FFD700"),
+                                accountState == 0
+                                    ? hexToColor("FFD700")
+                                    : Colors.blue,
                                 Colors.black,
                               ],
                               begin: Alignment.bottomCenter,
@@ -70,11 +94,62 @@ class _TransactionsState extends State<Transactions> {
                       ],
                     ),
                   ),
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 18,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              ...List.generate(2, (index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      accountState = index;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 45,
+                                    width: 180,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: accountState == index
+                                          ? index == 0
+                                              ? hexToColor("FFD700")
+                                              : Colors.blue
+                                          : Colors.grey,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      accounts[index],
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                );
+                              })
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 18,
+                        ),
+                      ],
+                    ),
+                  ),
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection("Users")
                         .doc(currentUser!.email)
-                        .collection("Transactions")
+                        .collection(accountState == 0
+                            ? "Transactions"
+                            : "Transactions Saving")
+                        .orderBy('date', descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -98,7 +173,8 @@ class _TransactionsState extends State<Transactions> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      transaction['date'].toString(),
+                                      formatTransactionDate(
+                                          transaction['date'].toDate()),
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     Text(

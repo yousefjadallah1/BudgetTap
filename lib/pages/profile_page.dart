@@ -1,4 +1,5 @@
 import 'package:budgettap/Widgets/auth_controller.dart';
+import 'package:budgettap/Widgets/drawer.dart';
 import 'package:budgettap/Widgets/textbox_noEdit.dart';
 import 'package:budgettap/Widgets/textbox_widget.dart';
 import 'package:budgettap/pages/loading_page.dart';
@@ -17,6 +18,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final currentUser = FirebaseAuth.instance.currentUser;
   AuthController authController = Get.find();
   final userCollections = FirebaseFirestore.instance.collection("Users");
@@ -160,6 +162,12 @@ class _ProfilePageState extends State<ProfilePage> {
       //   centerTitle: true,
       //   backgroundColor: Colors.grey[900],
       // ),
+      key: scaffoldKey,
+      endDrawer: MyDrawer(
+        onProfileTap: goToProfilePage,
+        onSingOutTap: signout,
+        onHomePageTap: goToHome,
+      ),
 
       body: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
@@ -175,12 +183,43 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     height: 20,
                   ),
-                  Text("Profile",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.abel(
-                        color: Colors.white,
-                        fontSize: 40,
-                      )),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text("Profile",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.abel(
+                                  color: Colors.white,
+                                  fontSize: 40,
+                                )),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        //! settings
+                        width: 40,
+                        height: 40,
+                        color: Colors.transparent,
+                        margin: EdgeInsets.only(right: 20),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.menu,
+                            size: 30,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            scaffoldKey.currentState?.openEndDrawer();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                   SizedBox(
                     height: 30,
                   ),

@@ -20,7 +20,7 @@ class MyDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Colors.black,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -36,23 +36,54 @@ class MyDrawer extends StatelessWidget {
 
               //home list
               MyListTile(
-                  icon: Icons.home, text: "H O M E", ontap: onHomePageTap),
+                icon: Icons.home,
+                text: "H O M E",
+                ontap: onHomePageTap,
+              ),
               //profile
+              MyListTile(
+                icon: Icons.bar_chart_outlined,
+                text: "S T A T I S T I C S",
+                ontap: onProfileTap,
+              ),
+              MyListTile(
+                icon: Icons.swap_horiz,
+                text: "T R A N S A C T I O N S",
+                ontap: onProfileTap,
+              ),
               MyListTile(
                 icon: Icons.person,
                 text: "P R O F I L E",
                 ontap: onProfileTap,
               ),
+              MyListTile(
+                icon: Icons.credit_card,
+                text: "C A R D S",
+                ontap: onProfileTap,
+              ),
             ],
           ),
           //signout
-          Padding(
-            padding: const EdgeInsets.only(bottom: 25),
-            child: MyListTile(
-              icon: Icons.logout,
-              text: "L O G O U T",
-              ontap: onSingOutTap,
-            ),
+
+          Column(
+            children: [
+              // Padding(
+              //   padding: const EdgeInsets.only(bottom: 5),
+              //   child: MyListTile(
+              //     icon: Icons.settings,
+              //     text: "S E T T I N G S",
+              //     ontap: onSingOutTap,
+              //   ),
+              // ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 25),
+                child: MyListTile(
+                  icon: Icons.logout,
+                  text: "L O G O U T",
+                  ontap: onSingOutTap,
+                ),
+              ),
+            ],
           ),
         ],
       ),
