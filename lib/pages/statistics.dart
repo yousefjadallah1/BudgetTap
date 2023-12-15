@@ -164,44 +164,7 @@ class _StatisticsState extends State<Statistics> {
                             ),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Row(
-                            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ...List.generate(3, (index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      index_color = index;
-                                    });
-                                  },
-                                  child: Container(
-                                    height: 40,
-                                    width: 110,
-                                    margin:
-                                        EdgeInsets.only(left: 10, right: 10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: index_color == index
-                                          ? accountState == 0
-                                              ? hexToColor("FFD700")
-                                              : Colors.blue
-                                          : Colors.grey,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      day[index],
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                );
-                              })
-                            ],
-                          ),
-                        ),
+
                         // SizedBox(height: 20),
                         // Padding(
                         //   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -237,9 +200,6 @@ class _StatisticsState extends State<Statistics> {
                         //     ],
                         //   ),
                         // ),
-                        SizedBox(
-                          height: 20,
-                        ),
 
                         Chart(
                           transactions: transactions,
@@ -248,7 +208,7 @@ class _StatisticsState extends State<Statistics> {
 
                         //! chart
                         SizedBox(
-                          height: 20,
+                          height: 10,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -297,7 +257,8 @@ class _StatisticsState extends State<Statistics> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  getDayNameFromTimestamp(transaction['date']),
+                                  formatTransactionDate(
+                                      transaction['date'].toDate()),
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Text(
@@ -321,7 +282,7 @@ class _StatisticsState extends State<Statistics> {
                       }
                       return null;
                     },
-                    childCount: transactions?.length ?? 0,
+                    childCount: 5 ?? 0,
                   )),
                 ],
               ));
