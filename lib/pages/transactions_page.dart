@@ -22,6 +22,8 @@ class _TransactionsState extends State<Transactions> {
   Map<String, dynamic> userData = {};
   List accounts = ["Current", "Saving"];
   int accountState = 0;
+  String selectedSortOption = 'Sort by Date';
+  List<QueryDocumentSnapshot>? transactions;
   String formatTransactionDate(DateTime transactionDate) {
     DateTime now = DateTime.now();
     DateTime yesterday = DateTime.now().subtract(Duration(days: 1));
@@ -55,6 +57,7 @@ class _TransactionsState extends State<Transactions> {
           //get user data
           if (snapshot.hasData) {
             userData = snapshot.data!.data() as Map<String, dynamic>;
+
             return SafeArea(
               child: CustomScrollView(
                 slivers: [
@@ -142,6 +145,71 @@ class _TransactionsState extends State<Transactions> {
                       ],
                     ),
                   ),
+                  SliverToBoxAdapter(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 180,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey[950],
+                            border: Border.all(
+                              color:
+                                  Colors.white, // Set the desired border color
+                            ),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              padding: EdgeInsets.only(left: 10),
+                              value: selectedSortOption,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedSortOption = newValue!;
+                                  // Add logic to handle the selected sort option
+                                  // For example, you can update the UI or trigger a callback
+                                });
+                              },
+                              items: [
+                                DropdownMenuItem<String>(
+                                  value: 'Sort by Date',
+                                  child: Text('Sort by Date',
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.white)),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value: 'Sort by Most Recent',
+                                  child: Text('Sort by Most Recent',
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.white)),
+                                ),
+                              ],
+                              hint: Text(
+                                selectedSortOption
+                                    .toString(), // Display the selected value
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white),
+                              ),
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors
+                                      .white), // Text style for the selected item
+                              icon: Icon(Icons.arrow_drop_down,
+                                  color: Colors.white), // Icon for the dropdown
+                              iconSize: 24, // Size of the dropdown icon
+                              isExpanded:
+                                  true, // Make the dropdown button take the full width
+                              dropdownColor: Colors
+                                  .black, // Background color of the dropdown
+                              elevation: 5, // Elevation of the dropdown
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection("Users")
@@ -149,22 +217,29 @@ class _TransactionsState extends State<Transactions> {
                         .collection(accountState == 0
                             ? "Transactions"
                             : "Transactions Saving")
-                        .orderBy('date', descending: true)
+                        .orderBy(
+                          selectedSortOption == "Sort by Date"
+                              ? 'date'
+                              : 'createdAt',
+                          descending: true,
+                        )
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        List<QueryDocumentSnapshot> transactions =
-                            snapshot.data!.docs;
-
+                        transactions = snapshot.data!.docs;
                         return SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                              var transaction = transactions[index].data()
+                              var transaction = transactions?[index].data()
                                   as Map<String, dynamic>;
 
                               return ListTile(
                                 leading: Image.asset(
-                                    "assets/addings/${transaction['name']}.png"),
+                                  "assets/addings/${transaction['name']}.png",
+                                  width: 60, // Set your desired width
+                                  height: 60, // Set your desired height
+                                  fit: BoxFit.cover,
+                                ),
                                 title: Text(
                                   transaction['name'],
                                   style: TextStyle(color: Colors.white),
@@ -184,7 +259,7 @@ class _TransactionsState extends State<Transactions> {
                                   ],
                                 ),
                                 trailing: Text(
-                                  transaction['amount'].toString(),
+                                  "\$ ${transaction['amount'].toString()}",
                                   style: TextStyle(
                                     color: transaction['buy']
                                         ? Colors.green
@@ -195,7 +270,7 @@ class _TransactionsState extends State<Transactions> {
                                 isThreeLine: true,
                               );
                             },
-                            childCount: transactions.length,
+                            childCount: transactions?.length,
                           ),
                         );
                       } else if (snapshot.hasError) {

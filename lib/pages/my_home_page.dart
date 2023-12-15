@@ -343,7 +343,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Transactions History",
+                    "Recent Transactions",
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -360,7 +360,8 @@ class _MyHomePageState extends State<MyHomePage> {
               .doc(currentUser!.email)
               .collection(
                   accountState == 0 ? "Transactions" : "Transactions Saving")
-              .orderBy('date', descending: true)
+              .orderBy('createdAt', descending: true)
+              .limit(5)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -374,7 +375,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     return ListTile(
                       leading: Image.asset(
-                          "assets/addings/${transaction['name']}.png"),
+                        "assets/addings/${transaction['name']}.png",
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
                       title: Text(
                         transaction['name'],
                         style: TextStyle(color: Colors.white),
@@ -384,7 +389,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: TextStyle(color: Colors.white),
                       ),
                       trailing: Text(
-                        transaction['amount'].toString(),
+                        "\$ ${transaction['amount'].toString()}",
                         style: TextStyle(
                           color: transaction['buy'] ? Colors.green : Colors.red,
                           fontSize: 19,
@@ -466,6 +471,9 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Stack(
                 children: [
                   buildHeader(),
+                  SizedBox(
+                    height: 20,
+                  ),
                   accountState == 0
                       ? buildCreditCardSection()
                       : buildCreditCardSectionSaving(),

@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sized_box_for_whitespace, avoid_unnecessary_containers, sort_child_properties_last
 
 import 'package:budgettap/Widgets/auth_controller.dart';
+import 'package:budgettap/Widgets/bottomNavi.dart';
 import 'package:budgettap/pages/loading_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -89,9 +90,10 @@ class _AddState extends State<AddPage> {
       'name': selectedItem,
       'how': selectedItem2,
       'explain': explainController.text,
-      'amount': '\$ ${double.parse(amountController.text)}',
+      'amount': double.parse(amountController.text),
       'date': Timestamp.fromDate(date),
       'buy': buy,
+      'createdAt': FieldValue.serverTimestamp(),
     };
 
     // Show loading screen while saving
@@ -127,7 +129,6 @@ class _AddState extends State<AddPage> {
       double transactionAmount = double.parse(amountController.text);
       currentBalance -= transactionAmount;
     }
-
     //?? this is for the transfer between accounts
     if (selectedItem == "Transfer between accounts") {
       if (buy == true) {
@@ -145,9 +146,10 @@ class _AddState extends State<AddPage> {
           'name': selectedItem,
           'how': "revenue",
           'explain': explainController.text,
-          'amount': '\$ ${double.parse(amountController.text)}',
+          'amount': double.parse(amountController.text),
           'date': Timestamp.fromDate(date),
           'buy': !buy!,
+          'createdAt': FieldValue.serverTimestamp(),
         };
         await FirebaseFirestore.instance
             .collection("Users")
@@ -171,9 +173,10 @@ class _AddState extends State<AddPage> {
           'name': selectedItem,
           'how': "revenue",
           'explain': explainController.text,
-          'amount': '\$ ${double.parse(amountController.text)}',
+          'amount': double.parse(amountController.text),
           'date': Timestamp.fromDate(date),
           'buy': !buy!,
+          'createdAt': FieldValue.serverTimestamp(),
         };
         await FirebaseFirestore.instance
             .collection("Users")
@@ -208,8 +211,7 @@ class _AddState extends State<AddPage> {
       amountController.clear();
     });
 
-    Get.back();
-    Get.close(1);
+    Get.to(BottomNavi());
   }
 
   @override
@@ -232,7 +234,7 @@ class _AddState extends State<AddPage> {
                   children: [
                     backgroundContainer(context),
                     Positioned(
-                      top: 150,
+                      top: 130,
                       child: mainContainer(),
                     )
                   ],
@@ -528,8 +530,8 @@ class _AddState extends State<AddPage> {
                                 color: Colors.white,
                                 fontSize:
                                     selectedItem == "Transfer between accounts"
-                                        ? 15
-                                        : 18))
+                                        ? 13
+                                        : 16))
                       ]),
                     ),
                     value: e,
@@ -550,8 +552,8 @@ class _AddState extends State<AddPage> {
                               color: Colors.white,
                               fontSize:
                                   selectedItem == "Transfer between accounts"
-                                      ? 15
-                                      : 18))
+                                      ? 13
+                                      : 16))
                     ],
                   ))
               .toList(),
