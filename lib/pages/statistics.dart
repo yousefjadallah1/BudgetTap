@@ -222,11 +222,11 @@ class _StatisticsState extends State<Statistics> {
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500),
                               ),
-                              Icon(
-                                Icons.swap_vert,
-                                color: Colors.grey,
-                                size: 25,
-                              )
+                              // Icon(
+                              //   Icons.swap_vert,
+                              //   color: Colors.grey,
+                              //   size: 25,
+                              // )
                             ],
                           ),
                         )
@@ -280,9 +280,11 @@ class _StatisticsState extends State<Statistics> {
                           );
                         }
                       }
-                      return null;
+                      return SizedBox.shrink();
                     },
-                    childCount: 5 ?? 0,
+                    childCount: (transactions?.length ?? 0) > 5
+                        ? 5
+                        : (transactions?.length ?? 0),
                   )),
                 ],
               ));

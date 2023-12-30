@@ -41,6 +41,65 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.pop(context);
   }
 
+  Future<void> checkAndDeductOverdueBillsOnAppLaunch() async {
+    // Get the current date
+    DateTime currentDate = DateTime.now();
+
+    // Retrieve user data from Firestore
+    var snapshot = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser?.email)
+        .get();
+
+    if (snapshot.exists) {
+      Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
+      List<Map<String, dynamic>> bills =
+          List<Map<String, dynamic>>.from(userData['Bills']);
+
+      // Iterate through bills and check if any is overdue
+      for (var bill in bills) {
+        Timestamp dueDateTimestamp = bill['dueDate'];
+        DateTime dueDate = dueDateTimestamp.toDate();
+
+        // Check if the bill is overdue and not yet deducted
+        if (!bill['deducted'] && currentDate.isAfter(dueDate)) {
+          // Deduct the amount from the respective account balance
+          String selectedAccount = bill['account'];
+          double amount = bill['amount'];
+
+          await FirebaseFirestore.instance
+              .collection("Users")
+              .doc(currentUser?.email)
+              .update({
+            selectedAccount == "Current"
+                ? "Balance of Checking Account"
+                : "Balance of Saving Account": FieldValue.increment(-amount),
+          });
+
+          // Update the bill to mark it as deducted
+          await FirebaseFirestore.instance
+              .collection("Users")
+              .doc(currentUser?.email)
+              .update({
+            "Bills": FieldValue.arrayRemove([bill]),
+          });
+
+          await FirebaseFirestore.instance
+              .collection("Users")
+              .doc(currentUser?.email)
+              .update({
+            "Bills": FieldValue.arrayUnion([
+              {
+                ...bill,
+                'deducted': true,
+              },
+            ]),
+          });
+        }
+      }
+    }
+  }
+
   Widget buildHeader() {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
@@ -197,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 top: 50,
                 left: 20,
                 child: Text(
-                  '\$ ${userData?['Balance of Checking Account']}', // Your Visa logo asset
+                  '\$ ${userData?['Balance of Checking Account']?.toStringAsFixed(1)}',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
@@ -438,6 +497,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    // Check and deduct overdue bills when the app is launched
+    checkAndDeductOverdueBillsOnAppLaunch();
+
+    // Other initialization code...
+  }
+
+  @override
   Widget build(BuildContext context) {
     // double w = MediaQuery.of(context).size.width;
     // double h = MediaQuery.of(context).size.height;
@@ -445,11 +514,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: hexToColor("000000"),
       key: scaffoldKey,
-      endDrawer: MyDrawer(
-        onProfileTap: goToProfilePage,
-        onSingOutTap: signout,
-        onHomePageTap: goToHome,
-      ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection("Users")

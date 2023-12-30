@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MyDrawer extends StatelessWidget {
-  final void Function()? onProfileTap;
+  final void Function()? onBillsTap;
   final void Function()? onSingOutTap;
   final void Function()? onHomePageTap;
   MyDrawer(
       {super.key,
-      required this.onProfileTap,
+      required this.onBillsTap,
       required this.onSingOutTap,
       required this.onHomePageTap});
   final currentUser = FirebaseAuth.instance.currentUser;
@@ -35,31 +35,31 @@ class MyDrawer extends StatelessWidget {
               )),
 
               //home list
+              // MyListTile(
+              //   icon: Icons.home,
+              //   text: "H O M E",
+              //   ontap: onHomePageTap,
+              // ),
+              // //profile
+              // MyListTile(
+              //   icon: Icons.bar_chart_outlined,
+              //   text: "S T A T I S T I C S",
+              //   ontap: onProfileTap,
+              // ),
+              // MyListTile(
+              //   icon: Icons.swap_horiz,
+              //   text: "T R A N S A C T I O N S",
+              //   ontap: onProfileTap,
+              // ),
+              // MyListTile(
+              //   icon: Icons.person,
+              //   text: "P R O F I L E",
+              //   ontap: onProfileTap,
+              // ),
               MyListTile(
-                icon: Icons.home,
-                text: "H O M E",
-                ontap: onHomePageTap,
-              ),
-              //profile
-              MyListTile(
-                icon: Icons.bar_chart_outlined,
-                text: "S T A T I S T I C S",
-                ontap: onProfileTap,
-              ),
-              MyListTile(
-                icon: Icons.swap_horiz,
-                text: "T R A N S A C T I O N S",
-                ontap: onProfileTap,
-              ),
-              MyListTile(
-                icon: Icons.person,
-                text: "P R O F I L E",
-                ontap: onProfileTap,
-              ),
-              MyListTile(
-                icon: Icons.credit_card,
-                text: "C A R D S",
-                ontap: onProfileTap,
+                icon: Icons.receipt,
+                text: "B I L L S",
+                ontap: onBillsTap,
               ),
             ],
           ),

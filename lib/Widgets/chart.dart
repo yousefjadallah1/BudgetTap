@@ -139,7 +139,7 @@ class _ChartState extends State<Chart> {
                 yValueMapper: (SalesData sales, _) => sales.sales,
                 dataLabelSettings: DataLabelSettings(
                   textStyle: TextStyle(color: Colors.grey),
-                  isVisible: false,
+                  isVisible: true,
                 ),
               )
             ],

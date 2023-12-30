@@ -1,7 +1,9 @@
 import 'package:budgettap/Widgets/auth_controller.dart';
+import 'package:budgettap/Widgets/bottomNavi.dart';
 import 'package:budgettap/Widgets/drawer.dart';
 import 'package:budgettap/Widgets/textbox_noEdit.dart';
 import 'package:budgettap/Widgets/textbox_widget.dart';
+import 'package:budgettap/pages/bills_page.dart';
 import 'package:budgettap/pages/loading_page.dart';
 import 'package:budgettap/pages/my_home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,13 +29,12 @@ class _ProfilePageState extends State<ProfilePage> {
     authController.logout();
   }
 
-  void goToProfilePage() {
-    Navigator.pop(context);
-    //Get.to(() => ProfilePage());
+  void goToBillsPage() {
+    Get.to(() => Bills());
   }
 
   void goToHome() {
-    Get.off(() => MyHomePage());
+    Get.off(() => BottomNavi());
   }
 
   Future<void> editField(String field) async {
@@ -164,7 +165,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // ),
       key: scaffoldKey,
       endDrawer: MyDrawer(
-        onProfileTap: goToProfilePage,
+        onBillsTap: goToBillsPage,
         onSingOutTap: signout,
         onHomePageTap: goToHome,
       ),
