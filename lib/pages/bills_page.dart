@@ -1,6 +1,4 @@
 // ignore_for_file: prefer_const_constructors
-import 'package:flutter/cupertino.dart';
-import 'package:budgettap/pages/loading_page.dart';
 import 'package:budgettap/pages/signup_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import '../Widgets/auth_controller.dart';
 
 class Bills extends StatefulWidget {
@@ -100,12 +97,11 @@ class _BillsState extends State<Bills> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
         title: Text(
           "Bills",
-          style: GoogleFonts.abel(
-            fontSize: 35,
-          ),
+          style: GoogleFonts.abel(fontSize: 35, color: Colors.white),
           textAlign: TextAlign.center,
         ),
         centerTitle: true,
@@ -384,25 +380,35 @@ class _BillsState extends State<Bills> {
   @override
   void initState() {
     super.initState();
-    // Fetch bills from Firestore when the widget is initialized
     fetchBills();
     checkAndDeductOverdueBills();
   }
 
   Future<void> fetchBills() async {
-    // Retrieve bills from Firestore
-    var snapshot = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(currentUser?.email)
-        .get();
+    try {
+      // Retrieve bills from Firestore
+      var snapshot = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(currentUser?.email)
+          .get();
 
-    if (snapshot.exists) {
-      userData = snapshot.data() as Map<String, dynamic>;
-      if (userData!['Bills'] != null) {
-        setState(() {
-          bills = List<Map<String, dynamic>>.from(userData!['Bills']);
-        });
+      if (snapshot.exists) {
+        userData = snapshot.data() as Map<String, dynamic>;
+        if (userData!['Bills'] != null) {
+          setState(() {
+            bills = List<Map<String, dynamic>>.from(userData!['Bills']);
+          });
+        } else {
+          // No bills found, handle this scenario (e.g., show a message)
+          // For example, you could set bills to an empty list:
+          setState(() {
+            bills = [];
+          });
+        }
       }
+    } catch (e) {
+      // Handle exceptions, e.g., print the error
+      print("Error fetching bills: $e");
     }
   }
 }

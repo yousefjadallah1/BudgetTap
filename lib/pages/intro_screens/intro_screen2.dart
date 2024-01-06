@@ -26,7 +26,7 @@ class IntroScreen2 extends StatelessWidget {
             padding: EdgeInsets.only(left: 10, right: 10),
             child: Center(
               child: Text(
-                "Financial Control at Your Fingertips",
+                "Financial Control",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -40,7 +40,7 @@ class IntroScreen2 extends StatelessWidget {
             padding: EdgeInsets.only(left: 15, right: 15),
             child: Center(
               child: Text(
-                "Effortlessly manage your finances with BudgetTap's intuitive interface. Stay in control of your spending, visualize your budget, and make informed financial decisions.",
+                "Stay in control of your spending, visualize your budget, and make informed financial decisions.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,

@@ -2,7 +2,6 @@
 
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:budgettap/Widgets/chart.dart';
-import 'package:budgettap/Widgets/money_data.dart';
 import 'package:budgettap/pages/loading_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -268,7 +267,7 @@ class _StatisticsState extends State<Statistics> {
                               ],
                             ),
                             trailing: Text(
-                              transaction['amount'].toString(),
+                              "\$ ${transaction['amount'].toString()}",
                               style: TextStyle(
                                 color: transaction['buy']
                                     ? Colors.green

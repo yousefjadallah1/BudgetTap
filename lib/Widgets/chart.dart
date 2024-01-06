@@ -1,4 +1,5 @@
-import 'dart:math';
+// ignore_for_file: must_be_immutable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -125,7 +126,8 @@ class _ChartState extends State<Chart> {
             enableAxisAnimation: true,
             primaryXAxis: CategoryAxis(
               labelPlacement: LabelPlacement.betweenTicks,
-              majorGridLines: MajorGridLines(width: 0.2),
+              majorGridLines: MajorGridLines(width: 0.12),
+              //majorTickLines: MajorTickLines(width: 0.1),
               labelRotation: -45,
             ),
             series: <ColumnSeries<SalesData, String>>[
@@ -138,7 +140,7 @@ class _ChartState extends State<Chart> {
                 xValueMapper: (SalesData sales, _) => sales.month,
                 yValueMapper: (SalesData sales, _) => sales.sales,
                 dataLabelSettings: DataLabelSettings(
-                  textStyle: TextStyle(color: Colors.grey),
+                  textStyle: TextStyle(color: Colors.white, fontSize: 13),
                   isVisible: true,
                 ),
               )

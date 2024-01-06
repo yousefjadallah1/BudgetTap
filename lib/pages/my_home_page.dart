@@ -1,5 +1,4 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-import 'package:budgettap/Widgets/drawer.dart';
 import 'package:budgettap/pages/loading_page.dart';
 import 'package:budgettap/pages/profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -41,6 +40,89 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.pop(context);
   }
 
+  Future<void> updateBalance(DateTime nextSalaryDate, double amountToAdd,
+      String selectedFrequency) async {
+    DateTime currentDate = DateTime.now();
+
+    while (nextSalaryDate.isBefore(currentDate)) {
+      switch (selectedFrequency) {
+        case "Daily":
+          // If the frequency is daily, add salary every day
+          await addSalaryToBalance(amountToAdd);
+          nextSalaryDate = nextSalaryDate.add(Duration(days: 1));
+          break;
+
+        case "Weekly":
+          // If the frequency is weekly, add salary every week
+          await addSalaryToBalance(amountToAdd);
+          nextSalaryDate = nextSalaryDate.add(Duration(days: 7));
+          break;
+
+        case "Monthly":
+          // If the frequency is monthly, add salary every month
+          await addSalaryToBalance(amountToAdd);
+          nextSalaryDate = DateTime(nextSalaryDate.year,
+              nextSalaryDate.month + 1, nextSalaryDate.day);
+          break;
+
+        case "Yearly":
+          // If the frequency is yearly, add salary every year
+          await addSalaryToBalance(amountToAdd);
+          nextSalaryDate = DateTime(nextSalaryDate.year + 1,
+              nextSalaryDate.month, nextSalaryDate.day);
+          break;
+      }
+    }
+  }
+
+  Future<void> addSalaryToBalance(double amount) async {
+    // Fetch the current balance
+    var snapshot = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .get();
+
+    if (snapshot.exists) {
+      double currentBalance =
+          snapshot.data()?["Balance of Checking Account"] ?? 0.0;
+
+      // Update the balance by adding the salary amount
+      double newBalance = currentBalance + amount;
+
+      // Update the Firestore document with the new balance
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(currentUser!.email)
+          .update({
+        "Balance of Checking Account": newBalance,
+      });
+    }
+  }
+
+  Future<void> updateBalanceFromSalary() async {
+    // Get user data from Firestore
+    var snapshot = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .get();
+
+    if (snapshot.exists) {
+      Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
+
+      // Check if there is a salary start date
+      DateTime? salaryStartDate = userData['Salary']['StartDate']?.toDate();
+
+      if (salaryStartDate != null) {
+        // Calculate the next salary date based on the frequency
+        DateTime nextSalaryDate = salaryStartDate;
+
+        // Update balance based on salary frequency
+        await updateBalance(nextSalaryDate, userData['Salary']['Amount'],
+            userData['Salary']['Frequency']);
+      }
+    }
+  }
+
   Future<void> checkAndDeductOverdueBillsOnAppLaunch() async {
     // Get the current date
     DateTime currentDate = DateTime.now();
@@ -53,8 +135,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (snapshot.exists) {
       Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
-      List<Map<String, dynamic>> bills =
-          List<Map<String, dynamic>>.from(userData['Bills']);
+      List<Map<String, dynamic>> bills = (userData['Bills'] as List<dynamic>?)
+              ?.cast<
+                  Map<String,
+                      dynamic>>() // Ensure each item is a Map<String, dynamic>
+              .toList() ??
+          [];
 
       // Iterate through bills and check if any is overdue
       for (var bill in bills) {
@@ -128,29 +214,29 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: Stack(
             children: [
-              Positioned(
-                top: h * 0.039,
-                left: w * 0.84,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(7),
-                  child: Container(
-                    //! settings
-                    width: 40,
-                    height: 40,
-                    color: Colors.transparent,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.notifications,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        scaffoldKey.currentState?.openEndDrawer();
-                      },
-                    ),
-                  ),
-                ),
-              ),
+              // Positioned(
+              //   top: h * 0.039,
+              //   left: w * 0.84,
+              //   child: ClipRRect(
+              //     borderRadius: BorderRadius.circular(7),
+              //     child: Container(
+              //       //! settings
+              //       width: 40,
+              //       height: 40,
+              //       color: Colors.transparent,
+              //       child: IconButton(
+              //         icon: Icon(
+              //           Icons.cabin_sharp,
+              //           size: 30,
+              //           color: Colors.white,
+              //         ),
+              //         onPressed: () {
+              //           scaffoldKey.currentState?.openEndDrawer();
+              //         },
+              //       ),
+              //     ),
+              //   ),
+              // ),
               Padding(
                 padding: EdgeInsets.only(top: h * 0.035, left: w * 0.02),
                 child: Column(
@@ -502,7 +588,30 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // Check and deduct overdue bills when the app is launched
     checkAndDeductOverdueBillsOnAppLaunch();
+    FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser?.email)
+        .get()
+        .then((snapshot) async {
+      if (snapshot.exists) {
+        Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
 
+        // Check if there is a salary start date
+        DateTime? salaryStartDate = userData['Salary']['StartDate']?.toDate();
+
+        if (salaryStartDate != null) {
+          // Calculate the next salary date based on the frequency
+          DateTime nextSalaryDate = salaryStartDate;
+
+          // Check if the next salary date is in the future
+          if (nextSalaryDate.isAfter(DateTime.now())) {
+            // Update balance based on salary frequency
+            await updateBalance(nextSalaryDate, userData['Salary']['Amount'],
+                userData['Salary']['Frequency']);
+          }
+        }
+      }
+    });
     // Other initialization code...
   }
 

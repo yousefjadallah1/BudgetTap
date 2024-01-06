@@ -5,12 +5,16 @@ import 'package:budgettap/Widgets/textbox_noEdit.dart';
 import 'package:budgettap/Widgets/textbox_widget.dart';
 import 'package:budgettap/pages/bills_page.dart';
 import 'package:budgettap/pages/loading_page.dart';
-import 'package:budgettap/pages/my_home_page.dart';
+import 'package:budgettap/pages/salary_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+Color hexToColor(String hexCode) {
+  return Color(int.parse(hexCode, radix: 16) + 0xFF000000);
+} //!colors
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -35,6 +39,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void goToHome() {
     Get.off(() => BottomNavi());
+  }
+
+  void goToSalaryPage() {
+    Get.to(() => SalaryPage());
   }
 
   Future<void> editField(String field) async {
@@ -167,7 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
       endDrawer: MyDrawer(
         onBillsTap: goToBillsPage,
         onSingOutTap: signout,
-        onHomePageTap: goToHome,
+        onSalaryTap: goToSalaryPage,
       ),
 
       body: StreamBuilder<DocumentSnapshot>(
@@ -179,6 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
             //get user data
             if (snapshot.hasData) {
               final userData = snapshot.data!.data() as Map<String, dynamic>;
+              var salaryData = userData!['Salary'];
               return ListView(
                 children: [
                   SizedBox(
@@ -220,6 +229,26 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ],
+                  ),
+                  Container(
+                    width: double.infinity,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          hexToColor("FFD700"),
+                          Colors.black,
+                          // Colors.black,
+                          // Colors.black,
+                        ],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.center,
+                      ),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 30,
@@ -275,10 +304,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     onPressed: () =>
                         editFieldDouble("Balance of Saving Account"),
                   ),
-                  MyTextBox(
-                    text: userData['Salary per month'].toString(),
-                    sectionName: "Salary per month",
-                    onPressed: () => editFieldDouble("Salary"),
+                  MyTextBoxNoEdit(
+                    text: salaryData['Amount'].toString(),
+                    sectionName: "Salary",
                   ),
                   SizedBox(height: 20),
                 ],

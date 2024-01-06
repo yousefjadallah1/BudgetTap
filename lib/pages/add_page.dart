@@ -85,6 +85,10 @@ class _AddState extends State<AddPage> {
       return;
     }
 
+    if (buy == null) {
+      buy = false;
+    }
+
     // Prepare the transaction data
     transData = {
       'name': selectedItem,
@@ -217,6 +221,7 @@ class _AddState extends State<AddPage> {
   @override
   Widget build(BuildContext context) {
     selectedItem3 ??= "Current";
+    selectedItem2 ??= "expenses";
     return Scaffold(
       backgroundColor: Colors.black,
       body: StreamBuilder<DocumentSnapshot>(

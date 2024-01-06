@@ -8,12 +8,12 @@ import 'package:get/get.dart';
 class MyDrawer extends StatelessWidget {
   final void Function()? onBillsTap;
   final void Function()? onSingOutTap;
-  final void Function()? onHomePageTap;
+  final void Function()? onSalaryTap;
   MyDrawer(
       {super.key,
       required this.onBillsTap,
       required this.onSingOutTap,
-      required this.onHomePageTap});
+      required this.onSalaryTap});
   final currentUser = FirebaseAuth.instance.currentUser;
   AuthController authController = Get.find();
 
@@ -51,15 +51,15 @@ class MyDrawer extends StatelessWidget {
               //   text: "T R A N S A C T I O N S",
               //   ontap: onProfileTap,
               // ),
-              // MyListTile(
-              //   icon: Icons.person,
-              //   text: "P R O F I L E",
-              //   ontap: onProfileTap,
-              // ),
               MyListTile(
                 icon: Icons.receipt,
                 text: "B I L L S",
                 ontap: onBillsTap,
+              ),
+              MyListTile(
+                icon: Icons.attach_money,
+                text: "S A L A R Y",
+                ontap: onSalaryTap,
               ),
             ],
           ),

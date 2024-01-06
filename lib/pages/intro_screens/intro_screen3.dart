@@ -62,7 +62,7 @@ class _IntroScreen3State extends State<IntroScreen3>
             padding: EdgeInsets.only(left: 10, right: 10),
             child: Center(
               child: Text(
-                "Empowering Your Financial Journey",
+                "Empower Finances.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -76,7 +76,7 @@ class _IntroScreen3State extends State<IntroScreen3>
             padding: EdgeInsets.only(left: 15, right: 15),
             child: Center(
               child: Text(
-                "BudgetTap empowers you to take charge of your money. We're here to simplify your budgeting journey. Let's start managing your finances wisely.",
+                "We're here to simplify your budgeting journey. Let's start managing your finances wisely.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,

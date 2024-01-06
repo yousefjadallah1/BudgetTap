@@ -54,6 +54,8 @@ class AuthController extends GetxController {
         email: emailConroller,
         password: passwordController,
       );
+      DateTime date = DateTime.now();
+
       FirebaseFirestore.instance
           .collection("Users")
           .doc(userCredential.user!.email)
@@ -62,7 +64,11 @@ class AuthController extends GetxController {
         'Name': nameController,
         'Balance of Checking Account': 0.0,
         'Balance of Saving Account': 0.0,
-        'Salary per month': 0.0,
+        'Salary': {
+          'Amount': 0.0,
+          'Frequency': 'Monthly',
+          'StartDate': date, // You might want to set a default value here
+        },
       });
       // Get the user ID (UID)
       // String uid = userCredential.user!.uid;
@@ -149,6 +155,7 @@ class AuthService {
           await _auth.signInWithCredential(credential);
 
       String? userEmail = userCredential.user?.email;
+      DateTime date = DateTime.now();
 
       // Check if the user already exists in Firestore
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
@@ -166,7 +173,11 @@ class AuthService {
           'Name': userCredential.user?.displayName ?? '',
           'Balance of Checking Account': 0.0,
           'Balance of Saving Account': 0.0,
-          'Salary per month': 0.0,
+          'Salary': {
+            'Amount': 0.0,
+            'Frequency': 'Monthly',
+            'StartDate': date, // You might want to set a default value here
+          },
         });
       }
 
