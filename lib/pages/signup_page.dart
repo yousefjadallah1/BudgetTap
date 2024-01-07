@@ -7,6 +7,7 @@ import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:budgettap/Widgets/logo_widget.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 Color hexToColor(String hexCode) {
   return Color(int.parse(hexCode, radix: 16) + 0xFF000000);
@@ -191,6 +192,24 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               GestureDetector(
                 onTap: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      return AlertDialog(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0.0,
+                        content: Center(
+                          child: LoadingAnimationWidget.discreteCircle(
+                            color: Colors.white,
+                            secondRingColor: hexToColor("FFD700"),
+                            thirdRingColor: Colors.blue,
+                            size: 80,
+                          ),
+                        ),
+                      );
+                    },
+                  );
                   AuthController.instance.register(
                     emailController.text.trim(),
                     passwordController.text.trim(),
@@ -237,6 +256,24 @@ class _SignUpPageState extends State<SignUpPage> {
               Center(
                 child: GestureDetector(
                   onTap: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.transparent,
+                          elevation: 0.0,
+                          content: Center(
+                            child: LoadingAnimationWidget.discreteCircle(
+                              color: Colors.white,
+                              secondRingColor: hexToColor("FFD700"),
+                              thirdRingColor: Colors.blue,
+                              size: 80,
+                            ),
+                          ),
+                        );
+                      },
+                    );
                     AuthService().signInWithGoogle(context, (String email) {});
                   },
                   child: CircleAvatar(

@@ -43,6 +43,7 @@ class _BottomNaviState extends State<BottomNavi> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: BottomAppBar(
         color: Colors.black,
+        elevation: 0.0,
         shape: CircularNotchedRectangle(),
         child: Padding(
           padding: const EdgeInsets.only(top: 6.5, bottom: 6.5),

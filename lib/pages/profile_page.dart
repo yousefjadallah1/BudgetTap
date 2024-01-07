@@ -1,6 +1,7 @@
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:budgettap/Widgets/bottomNavi.dart';
 import 'package:budgettap/Widgets/drawer.dart';
+import 'package:budgettap/Widgets/textBoxSalary.dart';
 import 'package:budgettap/Widgets/textbox_noEdit.dart';
 import 'package:budgettap/Widgets/textbox_widget.dart';
 import 'package:budgettap/pages/bills_page.dart';
@@ -43,6 +44,20 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void goToSalaryPage() {
     Get.to(() => SalaryPage());
+  }
+
+  Future<void> removeSalary() async {
+    DateTime date = DateTime.now();
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .update({
+      "Salary": {
+        "Frequency": "Yearly",
+        "Amount": 0,
+        "StartDate": date,
+      },
+    });
   }
 
   Future<void> editField(String field) async {
@@ -304,9 +319,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     onPressed: () =>
                         editFieldDouble("Balance of Saving Account"),
                   ),
-                  MyTextBoxNoEdit(
+                  MyTextBoxSalary(
                     text: salaryData['Amount'].toString(),
                     sectionName: "Salary",
+                    onPressed: () {
+                      removeSalary();
+                    },
                   ),
                   SizedBox(height: 20),
                 ],

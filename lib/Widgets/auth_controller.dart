@@ -87,6 +87,7 @@ class AuthController extends GetxController {
   }
 
   Future<void> login(String email, String password) async {
+    
     try {
       await auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (e) {

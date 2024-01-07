@@ -107,11 +107,13 @@ class _AddState extends State<AddPage> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.transparent,
+          elevation: 0.0,
           content: Center(
-            child: LoadingAnimationWidget.flickr(
-              leftDotColor: Colors.white,
-              rightDotColor: hexToColor("FFD700"),
-              size: 100,
+            child: LoadingAnimationWidget.discreteCircle(
+              color: Colors.white,
+              secondRingColor: hexToColor("FFD700"),
+              thirdRingColor: Colors.blue,
+              size: 80,
             ),
           ),
         );

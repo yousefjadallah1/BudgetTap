@@ -1,11 +1,10 @@
 import 'package:budgettap/Widgets/bottomNavi.dart';
-import 'package:budgettap/pages/loading_page.dart';
-import 'package:budgettap/pages/signup_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:lottie/lottie.dart';
 
 import '../Widgets/auth_controller.dart';
@@ -240,6 +239,24 @@ class _SalaryPageState extends State<SalaryPage> {
   }
 
   Future<void> saveSalaryToFirestore() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          content: Center(
+            child: LoadingAnimationWidget.discreteCircle(
+              color: Colors.white,
+              secondRingColor: hexToColor("FFD700"),
+              thirdRingColor: Colors.blue,
+              size: 80,
+            ),
+          ),
+        );
+      },
+    );
     // Save salary details to Firestore
     await FirebaseFirestore.instance
         .collection("Users")

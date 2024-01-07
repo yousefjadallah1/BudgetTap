@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
 import 'signup_page.dart';
 
 class LoadingScreen extends StatelessWidget {
@@ -12,9 +11,9 @@ class LoadingScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SpinKitFadingCube(
-              color: hexToColor("FFD700"), // Customize the color
-              size: 50.0, // Adjust the size
+            SpinKitSpinningLines(
+              color: hexToColor("FFD700"),
+              size: 90.0,
             ),
             SizedBox(height: 20),
             Text(

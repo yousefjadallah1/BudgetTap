@@ -1,7 +1,7 @@
 import 'package:budgettap/pages/intro_screens/intro_screen1.dart';
 import 'package:budgettap/pages/intro_screens/intro_screen2.dart';
 import 'package:budgettap/pages/intro_screens/intro_screen3.dart';
-import 'package:budgettap/pages/signup_page.dart';
+import 'package:budgettap/pages/signin_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -73,7 +73,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       onLastPage
                           ? GestureDetector(
                               onTap: () {
-                                Get.off(() => SignUpPage());
+                                Get.off(() => SignInPage());
                               },
                               child: Text("done",
                                   style: TextStyle(

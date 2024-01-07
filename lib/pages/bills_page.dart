@@ -218,6 +218,7 @@ class _BillsState extends State<Bills> {
                   GestureDetector(
                     onTap: () async {
                       FocusScope.of(context).unfocus();
+
                       await addBillToFirestore();
                     },
                     child: Container(
@@ -277,6 +278,31 @@ class _BillsState extends State<Bills> {
                         fontSize: 22,
                         fontWeight: FontWeight.w500),
                   ),
+                  Row(
+                    children: [
+                      Text(
+                        "Paid  ",
+                        style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        "/",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        "  Not",
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
@@ -292,35 +318,51 @@ class _BillsState extends State<Bills> {
 
                 if ((accountState == 0 && bill['account'] == 'Current') ||
                     (accountState != 0 && bill['account'] == 'Saving')) {
-                  return ListTile(
-                    title: Text(
-                      bill['name'],
-                      style: TextStyle(
-                        color: isDueDatePassed ? Colors.red : Colors.white,
+                  return Dismissible(
+                    key: UniqueKey(),
+                    onDismissed: (direction) async {
+                      // Handle bill removal from Firestore
+                      await removeBill(bill);
+                    },
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.only(right: 16),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
                       ),
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${bill['account']}',
-                          style: TextStyle(color: Colors.white),
+                    child: ListTile(
+                      title: Text(
+                        bill['name'],
+                        style: TextStyle(
+                          color: isDueDatePassed ? Colors.green : Colors.red,
                         ),
-                        Text(
-                          '${DateFormat('MMMM d, y').format(dueDate)}',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    trailing: Text(
-                      "\$ ${bill['amount']}",
-                      style: TextStyle(
-                        color: isDueDatePassed ? Colors.red : Colors.white,
-                        fontSize: 19,
                       ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Account: ${bill['account']}',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          Text(
+                            'Date: ${DateFormat('MMMM d, y').format(dueDate)}',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      trailing: Text(
+                        "\$ ${bill['amount']}",
+                        style: TextStyle(
+                          color: isDueDatePassed ? Colors.green : Colors.red,
+                          fontSize: 19,
+                        ),
+                      ),
+                      isThreeLine: true,
                     ),
-                    isThreeLine: true,
                   );
                 } else {
                   // Return an empty container for items that should be hidden
@@ -410,5 +452,14 @@ class _BillsState extends State<Bills> {
       // Handle exceptions, e.g., print the error
       print("Error fetching bills: $e");
     }
+  }
+
+  removeBill(Map<String, dynamic> bill) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser?.email)
+        .update({
+      "Bills": FieldValue.arrayRemove([bill]),
+    });
   }
 }

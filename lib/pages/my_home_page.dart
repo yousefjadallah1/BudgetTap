@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:budgettap/Widgets/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 Color hexToColor(String hexCode) {
   return Color(int.parse(hexCode, radix: 16) + 0xFF000000);
@@ -553,7 +554,18 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             } else {
               return SliverToBoxAdapter(
-                child: Center(child: CircularProgressIndicator()),
+                child: AlertDialog(
+                  backgroundColor: Colors.black,
+                  elevation: 0.0,
+                  content: Center(
+                    child: LoadingAnimationWidget.staggeredDotsWave(
+                      color: accountState == 0
+                          ? hexToColor("FFD700")
+                          : Colors.blue,
+                      size: 50,
+                    ),
+                  ),
+                ),
               );
             }
           },

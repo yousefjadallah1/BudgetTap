@@ -7,6 +7,7 @@ import 'package:budgettap/Widgets/logo_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'signup_page.dart';
 
 Color hexToColor(String hexCode) {
@@ -137,9 +138,28 @@ class _SignInPageState extends State<SignInPage> {
               ),
               SizedBox(height: h * 0.01),
               GestureDetector(
-                onTap: () => AuthController.instance.login(
-                    emailController.text.trim(),
-                    passwordController.text.trim()),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      return AlertDialog(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0.0,
+                        content: Center(
+                          child: LoadingAnimationWidget.discreteCircle(
+                            color: Colors.white,
+                            secondRingColor: hexToColor("FFD700"),
+                            thirdRingColor: Colors.blue,
+                            size: 80,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                  AuthController.instance.login(emailController.text.trim(),
+                      passwordController.text.trim());
+                },
                 child: Container(
                   margin: EdgeInsets.only(
                     left: 18.0,
@@ -164,6 +184,24 @@ class _SignInPageState extends State<SignInPage> {
               SizedBox(height: h * 0.03),
               GestureDetector(
                 onTap: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      return AlertDialog(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0.0,
+                        content: Center(
+                          child: LoadingAnimationWidget.discreteCircle(
+                            color: Colors.white,
+                            secondRingColor: hexToColor("FFD700"),
+                            thirdRingColor: Colors.blue,
+                            size: 80,
+                          ),
+                        ),
+                      );
+                    },
+                  );
                   AuthService().signInWithGoogle(context, (String email) {});
                 },
                 child: CircleAvatar(
