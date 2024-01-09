@@ -184,6 +184,18 @@ class _TransactionsState extends State<Transactions> {
                                       style: TextStyle(
                                           fontSize: 14, color: Colors.white)),
                                 ),
+                                DropdownMenuItem<String>(
+                                  value: 'Sort by Expenses',
+                                  child: Text('Expenses',
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.white)),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value: 'Sort by Revenue',
+                                  child: Text('Revenues',
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.white)),
+                                ),
                               ],
                               hint: Text(
                                 selectedSortOption
@@ -220,19 +232,35 @@ class _TransactionsState extends State<Transactions> {
                         .orderBy(
                           selectedSortOption == "Sort by Date"
                               ? 'date'
-                              : 'createdAt',
+                              : selectedSortOption == 'Sort by Most Recent'
+                                  ? 'createdAt'
+                                  : 'date', 
                           descending: true,
                         )
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         transactions = snapshot.data!.docs;
+
+                        // Filter transactions based on the selectedSortOption
+                        transactions = transactions?.where((transaction) {
+                          bool isExpense = !transaction['buy'];
+                          bool isRevenue = transaction['buy'];
+
+                          if (selectedSortOption == 'Sort by Expenses') {
+                            return isExpense;
+                          } else if (selectedSortOption == 'Sort by Revenue') {
+                            return isRevenue;
+                          } else {
+                            return true; // Include all transactions for other sorting options
+                          }
+                        }).toList();
+
                         return SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               var transaction = transactions?[index].data()
                                   as Map<String, dynamic>;
-
                               return ListTile(
                                 leading: Image.asset(
                                   "assets/addings/${transaction['name']}.png",
