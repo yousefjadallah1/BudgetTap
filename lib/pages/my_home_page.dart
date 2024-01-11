@@ -24,7 +24,6 @@ class _MyHomePageState extends State<MyHomePage> {
   AuthController authController = Get.find();
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final currentUser = FirebaseAuth.instance.currentUser;
-  //final userName = FirebaseFirestore.instance.collection("Users").doc(currentUser!.email).
   Map<String, dynamic>? userData = {};
   List accounts = ["Current", "Saving"];
   int accountState = 0;
@@ -125,10 +124,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> checkAndDeductOverdueBillsOnAppLaunch() async {
-    // Get the current date
     DateTime currentDate = DateTime.now();
 
-    // Retrieve user data from Firestore
     var snapshot = await FirebaseFirestore.instance
         .collection("Users")
         .doc(currentUser?.email)
@@ -137,20 +134,17 @@ class _MyHomePageState extends State<MyHomePage> {
     if (snapshot.exists) {
       Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
       List<Map<String, dynamic>> bills = (userData['Bills'] as List<dynamic>?)
-              ?.cast<
-                  Map<String,
-                      dynamic>>() // Ensure each item is a Map<String, dynamic>
+              ?.cast<Map<String, dynamic>>()
               .toList() ??
           [];
 
-      // Iterate through bills and check if any is overdue
+      // check if any bills is overdue
       for (var bill in bills) {
         Timestamp dueDateTimestamp = bill['dueDate'];
         DateTime dueDate = dueDateTimestamp.toDate();
 
-        // Check if the bill is overdue and not yet deducted
+        // Check if the bill is overdue
         if (!bill['deducted'] && currentDate.isAfter(dueDate)) {
-          // Deduct the amount from the respective account balance
           String selectedAccount = bill['account'];
           double amount = bill['amount'];
 
@@ -163,7 +157,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 : "Balance of Saving Account": FieldValue.increment(-amount),
           });
 
-          // Update the bill to mark it as deducted
           await FirebaseFirestore.instance
               .collection("Users")
               .doc(currentUser?.email)
@@ -215,29 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: Stack(
             children: [
-              // Positioned(
-              //   top: h * 0.039,
-              //   left: w * 0.84,
-              //   child: ClipRRect(
-              //     borderRadius: BorderRadius.circular(7),
-              //     child: Container(
-              //       //! settings
-              //       width: 40,
-              //       height: 40,
-              //       color: Colors.transparent,
-              //       child: IconButton(
-              //         icon: Icon(
-              //           Icons.cabin_sharp,
-              //           size: 30,
-              //           color: Colors.white,
-              //         ),
-              //         onPressed: () {
-              //           scaffoldKey.currentState?.openEndDrawer();
-              //         },
-              //       ),
-              //     ),
-              //   ),
-              // ),
+              
               Padding(
                 padding: EdgeInsets.only(top: h * 0.035, left: w * 0.02),
                 child: Column(
@@ -335,7 +306,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 top: 30,
                 left: 20,
                 child: Text(
-                  'Total Balance', // Your Visa logo asset
+                  'Total Balance', 
                   style: TextStyle(color: Colors.white, fontSize: 17),
                 )),
             Positioned(
@@ -364,7 +335,7 @@ class _MyHomePageState extends State<MyHomePage> {
               bottom: 20,
               right: 20,
               child: Image.asset(
-                'assets/img/visa.png', // Your Visa logo asset
+                'assets/img/visa.png', 
                 width: 60,
                 height: 30,
                 color: Colors.white,
@@ -455,9 +426,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget buildTransactions() {
-    //double w = MediaQuery.of(context).size.width;
-    //double h = MediaQuery.of(context).size.height;
-
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -581,15 +549,12 @@ class _MyHomePageState extends State<MyHomePage> {
     if (transactionDate.year == now.year &&
         transactionDate.month == now.month &&
         transactionDate.day == now.day) {
-      // It's today
       return 'Today';
     } else if (transactionDate.year == yesterday.year &&
         transactionDate.month == yesterday.month &&
         transactionDate.day == yesterday.day) {
-      // It's yesterday
       return 'Yesterday';
     } else {
-      // It's a different day, format it as 'yyyy/MM/dd'
       return '${transactionDate.year} / ${transactionDate.month} / ${transactionDate.day}';
     }
   }
@@ -598,7 +563,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    // Check and deduct overdue bills when the app is launched
     checkAndDeductOverdueBillsOnAppLaunch();
     FirebaseFirestore.instance
         .collection("Users")
@@ -608,23 +572,18 @@ class _MyHomePageState extends State<MyHomePage> {
       if (snapshot.exists) {
         Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
 
-        // Check if there is a salary start date
         DateTime? salaryStartDate = userData['Salary']['StartDate']?.toDate();
 
         if (salaryStartDate != null) {
-          // Calculate the next salary date based on the frequency
           DateTime nextSalaryDate = salaryStartDate;
 
-          // Check if the next salary date is in the future
           if (nextSalaryDate.isAfter(DateTime.now())) {
-            // Update balance based on salary frequency
             await updateBalance(nextSalaryDate, userData['Salary']['Amount'],
                 userData['Salary']['Frequency']);
           }
         }
       }
     });
-    // Other initialization code...
   }
 
   @override
@@ -642,15 +601,13 @@ class _MyHomePageState extends State<MyHomePage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Show loading screen while waiting for data
+            //loading screen
             return LoadingScreen();
           } else if (snapshot.hasError) {
-            // Handle error
             return Center(
               child: Text('Error ${snapshot.error.toString()}'),
             );
           } else if (snapshot.hasData && snapshot.data!.exists) {
-            // Check if the document exists before accessing its fields
             userData = snapshot.data!.data() as Map<String, dynamic>;
             return SafeArea(
               child: Stack(
@@ -673,7 +630,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             );
           } else {
-            // Handle the case where there is no data or some fields are missing
             return LoadingScreen();
           }
         },

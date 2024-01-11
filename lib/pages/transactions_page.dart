@@ -8,6 +8,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Widgets/auth_controller.dart';
 
+Color hexToColor(String hexCode) {
+  return Color(int.parse(hexCode, radix: 16) + 0xFF000000);
+}
+
 class Transactions extends StatefulWidget {
   const Transactions({super.key});
 
@@ -18,7 +22,6 @@ class Transactions extends StatefulWidget {
 class _TransactionsState extends State<Transactions> {
   AuthController authController = Get.find();
   final currentUser = FirebaseAuth.instance.currentUser;
-  //final userName = FirebaseFirestore.instance.collection("Users").doc(currentUser!.email).
   Map<String, dynamic> userData = {};
   List accounts = ["Current", "Saving"];
   int accountState = 0;
@@ -31,15 +34,12 @@ class _TransactionsState extends State<Transactions> {
     if (transactionDate.year == now.year &&
         transactionDate.month == now.month &&
         transactionDate.day == now.day) {
-      // It's today
       return 'Today';
     } else if (transactionDate.year == yesterday.year &&
         transactionDate.month == yesterday.month &&
         transactionDate.day == yesterday.day) {
-      // It's yesterday
       return 'Yesterday';
     } else {
-      // It's a different day, format it as 'yyyy/MM/dd'
       return '${transactionDate.year} / ${transactionDate.month} / ${transactionDate.day}';
     }
   }
@@ -54,7 +54,6 @@ class _TransactionsState extends State<Transactions> {
             .doc(currentUser!.email)
             .snapshots(),
         builder: (context, snapshot) {
-          //get user data
           if (snapshot.hasData) {
             userData = snapshot.data!.data() as Map<String, dynamic>;
 
@@ -156,8 +155,7 @@ class _TransactionsState extends State<Transactions> {
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.grey[950],
                             border: Border.all(
-                              color:
-                                  Colors.white, // Set the desired border color
+                              color: Colors.white,
                             ),
                           ),
                           child: DropdownButtonHideUnderline(
@@ -167,8 +165,6 @@ class _TransactionsState extends State<Transactions> {
                               onChanged: (String? newValue) {
                                 setState(() {
                                   selectedSortOption = newValue!;
-                                  // Add logic to handle the selected sort option
-                                  // For example, you can update the UI or trigger a callback
                                 });
                               },
                               items: [
@@ -203,18 +199,14 @@ class _TransactionsState extends State<Transactions> {
                                 style: TextStyle(
                                     fontSize: 14, color: Colors.white),
                               ),
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors
-                                      .white), // Text style for the selected item
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
                               icon: Icon(Icons.arrow_drop_down,
-                                  color: Colors.white), // Icon for the dropdown
-                              iconSize: 24, // Size of the dropdown icon
-                              isExpanded:
-                                  true, // Make the dropdown button take the full width
-                              dropdownColor: Colors
-                                  .black, // Background color of the dropdown
-                              elevation: 5, // Elevation of the dropdown
+                                  color: Colors.white),
+                              iconSize: 24,
+                              isExpanded: true,
+                              dropdownColor: Colors.black,
+                              elevation: 5,
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
@@ -234,7 +226,7 @@ class _TransactionsState extends State<Transactions> {
                               ? 'date'
                               : selectedSortOption == 'Sort by Most Recent'
                                   ? 'createdAt'
-                                  : 'date', 
+                                  : 'date',
                           descending: true,
                         )
                         .snapshots(),
@@ -264,8 +256,8 @@ class _TransactionsState extends State<Transactions> {
                               return ListTile(
                                 leading: Image.asset(
                                   "assets/addings/${transaction['name']}.png",
-                                  width: 60, // Set your desired width
-                                  height: 60, // Set your desired height
+                                  width: 60,
+                                  height: 60, 
                                   fit: BoxFit.cover,
                                 ),
                                 title: Text(

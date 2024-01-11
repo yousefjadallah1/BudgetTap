@@ -269,7 +269,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     height: 30,
                   ),
 
-                  //user email
 
                   //!user detial
                   Padding(

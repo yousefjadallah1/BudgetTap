@@ -77,11 +77,10 @@ class _AddState extends State<AddPage> {
   }
 
   void _saveTransaction() async {
-    // Validate if all required fields are filled
+    // check iff required fields are filled
     if (selectedItem == null ||
         selectedItem2 == null ||
         amountController.text.isEmpty) {
-      // You might want to show an error message or handle this case differently
       return;
     }
 
@@ -89,7 +88,7 @@ class _AddState extends State<AddPage> {
       buy = false;
     }
 
-    // Prepare the transaction data
+    // transaction data
     transData = {
       'name': selectedItem,
       'how': selectedItem2,
@@ -100,7 +99,7 @@ class _AddState extends State<AddPage> {
       'createdAt': FieldValue.serverTimestamp(),
     };
 
-    // Show loading screen while saving
+    //loading screen
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -119,11 +118,11 @@ class _AddState extends State<AddPage> {
         );
       },
     );
-    //String? currentBalanceString = userData['Balance of Checking Account'];
     double currentBalance = selectedItem3 == "Current"
         ? userData['Balance of Checking Account']
         : userData['Balance of Saving Account'];
 
+// only for transfer between accounts
     double transferdAccountBalance = selectedItem3 == "Current"
         ? userData['Balance of Saving Account']
         : userData['Balance of Checking Account'];
@@ -135,7 +134,7 @@ class _AddState extends State<AddPage> {
       double transactionAmount = double.parse(amountController.text);
       currentBalance -= transactionAmount;
     }
-    //?? this is for the transfer between accounts
+    // this is for the transfer between accounts
     if (selectedItem == "Transfer between accounts") {
       if (buy == true) {
         double transferAmount = double.parse(amountController.text);
@@ -194,7 +193,7 @@ class _AddState extends State<AddPage> {
       }
     }
 
-    // Update Firestore with the transaction data
+    // update firestore with the transaction data
     await FirebaseFirestore.instance
         .collection("Users")
         .doc(currentUser!.email)
@@ -202,7 +201,7 @@ class _AddState extends State<AddPage> {
             selectedItem3 == "Current" ? "Transactions" : "Transactions Saving")
         .add(transData);
 
-    // Update the balance in Firestore
+    // update balance
     await FirebaseFirestore.instance
         .collection("Users")
         .doc(currentUser!.email)
@@ -232,7 +231,6 @@ class _AddState extends State<AddPage> {
               .doc(currentUser!.email)
               .snapshots(),
           builder: (context, snapshot) {
-            //get user data
             if (snapshot.hasData) {
               userData = snapshot.data!.data() as Map<String, dynamic>;
               return SafeArea(
@@ -601,7 +599,6 @@ class _AddState extends State<AddPage> {
         children: [
           Container(
             width: double.infinity,
-            //height: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),

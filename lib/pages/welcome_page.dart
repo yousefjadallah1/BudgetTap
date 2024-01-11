@@ -47,7 +47,6 @@ class _WelcomePageState extends State<WelcomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      //skip
                       onLastPage
                           ? Text("    ",
                               style: TextStyle(

@@ -34,23 +34,7 @@ class MyDrawer extends StatelessWidget {
                 size: 64,
               )),
 
-              //home list
-              // MyListTile(
-              //   icon: Icons.home,
-              //   text: "H O M E",
-              //   ontap: onHomePageTap,
-              // ),
-              // //profile
-              // MyListTile(
-              //   icon: Icons.bar_chart_outlined,
-              //   text: "S T A T I S T I C S",
-              //   ontap: onProfileTap,
-              // ),
-              // MyListTile(
-              //   icon: Icons.swap_horiz,
-              //   text: "T R A N S A C T I O N S",
-              //   ontap: onProfileTap,
-              // ),
+              
               MyListTile(
                 icon: Icons.receipt,
                 text: "B I L L S",
@@ -67,14 +51,7 @@ class MyDrawer extends StatelessWidget {
 
           Column(
             children: [
-              // Padding(
-              //   padding: const EdgeInsets.only(bottom: 5),
-              //   child: MyListTile(
-              //     icon: Icons.settings,
-              //     text: "S E T T I N G S",
-              //     ontap: onSingOutTap,
-              //   ),
-              // ),
+              
               Padding(
                 padding: const EdgeInsets.only(bottom: 25),
                 child: MyListTile(

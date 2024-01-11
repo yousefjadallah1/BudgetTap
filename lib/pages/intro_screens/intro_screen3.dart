@@ -9,7 +9,7 @@ class IntroScreen3 extends StatefulWidget {
 
 class _IntroScreen3State extends State<IntroScreen3>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller; // animation controller
+  late final AnimationController _controller;
   @override
   void initState() {
     super.initState();

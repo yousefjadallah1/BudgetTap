@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-import 'package:budgettap/pages/signup_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +5,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../Widgets/auth_controller.dart';
+
+Color hexToColor(String hexCode) {
+  return Color(int.parse(hexCode, radix: 16) + 0xFF000000);
+}
 
 class Bills extends StatefulWidget {
   const Bills({super.key});
@@ -43,17 +45,15 @@ class _BillsState extends State<Bills> {
   }
 
   Future<void> checkAndDeductOverdueBills() async {
-    // Get the current date
-    DateTime currentDate = DateTime.now();
+    DateTime currentDate = DateTime.now(); //todays date
 
-    // Iterate through bills and check if any is overdue
+    //check if any bills is overdue
     for (var bill in bills) {
       Timestamp dueDateTimestamp = bill['dueDate'];
       DateTime dueDate = dueDateTimestamp.toDate();
 
       // Check if the bill is overdue and not yet deducted
       if (!bill['deducted'] && currentDate.isAfter(dueDate)) {
-        // Deduct the amount from the respective account balance
         String selectedAccount = bill['account'];
         double amount = bill['amount'];
 
@@ -86,7 +86,6 @@ class _BillsState extends State<Bills> {
           ]),
         });
 
-        // Fetch updated bills from Firestore
         await fetchBills();
       }
     }
@@ -110,6 +109,24 @@ class _BillsState extends State<Bills> {
         children: [
           Column(
             children: [
+              Container(
+                width: double.infinity,
+                height: 20,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      accountState == 0 ? hexToColor("FFD700") : Colors.blue,
+                      Colors.black,
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.center,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+              ),
               SizedBox(
                 height: 18,
               ),
@@ -190,10 +207,6 @@ class _BillsState extends State<Bills> {
                   SizedBox(
                     height: 10,
                   ),
-                  // ElevatedButton(
-                  //   onPressed: () => _selectDate(context),
-                  //   child: Text('Select Due Date'),
-                  // ),
                   GestureDetector(
                     onTap: () async {
                       _selectDate(context);
@@ -203,8 +216,7 @@ class _BillsState extends State<Bills> {
                       height: 35,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              10.0), // Adjust the radius as needed
+                          borderRadius: BorderRadius.circular(10.0),
                           color: Colors.white),
                       child: Text(
                         'Select Due Date',
@@ -227,7 +239,7 @@ class _BillsState extends State<Bills> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
-                            10.0), // Adjust the radius as needed
+                            10.0),
                         color: accountState == 0
                             ? hexToColor("FFD700")
                             : Colors.blue,
@@ -321,7 +333,6 @@ class _BillsState extends State<Bills> {
                   return Dismissible(
                     key: UniqueKey(),
                     onDismissed: (direction) async {
-                      // Handle bill removal from Firestore
                       await removeBill(bill);
                     },
                     background: Container(
@@ -365,7 +376,6 @@ class _BillsState extends State<Bills> {
                     ),
                   );
                 } else {
-                  // Return an empty container for items that should be hidden
                   return Container();
                 }
               },
@@ -382,7 +392,6 @@ class _BillsState extends State<Bills> {
     String selectedAccount = accounts[accountState];
     DateTime dueDate = selectedDate;
 
-    // Check if the due date is in the past
     bool isDueDatePassed = DateTime.now().isAfter(dueDate);
 
     if (isDueDatePassed) {
@@ -411,10 +420,8 @@ class _BillsState extends State<Bills> {
       ]),
     });
 
-    // Fetch bills from Firestore after updating the document
     await fetchBills();
 
-    // Clear the form after adding the bill
     billNameController.clear();
     amountController.clear();
   }
@@ -441,15 +448,12 @@ class _BillsState extends State<Bills> {
             bills = List<Map<String, dynamic>>.from(userData!['Bills']);
           });
         } else {
-          // No bills found, handle this scenario (e.g., show a message)
-          // For example, you could set bills to an empty list:
           setState(() {
             bills = [];
           });
         }
       }
     } catch (e) {
-      // Handle exceptions, e.g., print the error
       print("Error fetching bills: $e");
     }
   }

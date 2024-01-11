@@ -35,7 +35,6 @@ class _StatisticsState extends State<Statistics> {
   List accounts = ["Current", "Saving"];
 
   final currentUser = FirebaseAuth.instance.currentUser;
-  //final userName = FirebaseFirestore.instance.collection("Users").doc(currentUser!.email).
   Map<String, dynamic> userData = {};
   Map<String, dynamic> transaction = {};
   List day = ['Week', 'Month', 'Year'];
@@ -49,15 +48,12 @@ class _StatisticsState extends State<Statistics> {
     if (transactionDate.year == now.year &&
         transactionDate.month == now.month &&
         transactionDate.day == now.day) {
-      // It's today
       return 'Today';
     } else if (transactionDate.year == yesterday.year &&
         transactionDate.month == yesterday.month &&
         transactionDate.day == yesterday.day) {
-      // It's yesterday
       return 'Yesterday';
     } else {
-      // It's a different day, format it as 'yyyy/MM/dd'
       return '${transactionDate.year} / ${transactionDate.month} / ${transactionDate.day}';
     }
   }
@@ -164,42 +160,6 @@ class _StatisticsState extends State<Statistics> {
                           ],
                         ),
 
-                        // SizedBox(height: 20),
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(horizontal: 15),
-                        //   child: Row(
-                        //     mainAxisAlignment: MainAxisAlignment.end,
-                        //     children: [
-                        //       Container(
-                        //         width: 120,
-                        //         height: 40,
-                        //         decoration: BoxDecoration(
-                        //             borderRadius: BorderRadius.circular(10),
-                        //             border: Border.all(
-                        //                 color: hexToColor("FFD700"),
-                        //                 width: 1.5)),
-                        //         child: Row(
-                        //           mainAxisAlignment:
-                        //               MainAxisAlignment.spaceAround,
-                        //           children: [
-                        //             Text(
-                        //               "Expense",
-                        //               style: TextStyle(
-                        //                   color: Colors.grey,
-                        //                   fontSize: 16,
-                        //                   fontWeight: FontWeight.w500),
-                        //             ),
-                        //             Icon(
-                        //               Icons.arrow_downward_sharp,
-                        //               color: Colors.grey,
-                        //             )
-                        //           ],
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-
                         Chart(
                           transactions: transactions,
                           accountState: accountState,
@@ -221,11 +181,7 @@ class _StatisticsState extends State<Statistics> {
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500),
                               ),
-                              // Icon(
-                              //   Icons.swap_vert,
-                              //   color: Colors.grey,
-                              //   size: 25,
-                              // )
+                             
                             ],
                           ),
                         )
@@ -244,8 +200,8 @@ class _StatisticsState extends State<Statistics> {
                           return ListTile(
                             leading: Image.asset(
                               "assets/addings/${transaction['name']}.png",
-                              width: 60, // Set your desired width
-                              height: 60, // Set your desired height
+                              width: 60, 
+                              height: 60, 
                               fit: BoxFit.cover,
                             ),
                             title: Text(

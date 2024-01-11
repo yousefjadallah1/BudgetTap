@@ -106,13 +106,7 @@ class _SalaryPageState extends State<SalaryPage> {
                 ),
               ],
             ),
-            // Padding(
-            //   padding: const EdgeInsets.only(top: 20, left: 20),
-            //   child: Text(
-            //     "Enter Salary Amount:",
-            //     style: TextStyle(color: Colors.white, fontSize: 18),
-            //   ),
-            // ),
+            
             SizedBox(
               height: 10,
             ),
@@ -160,7 +154,7 @@ class _SalaryPageState extends State<SalaryPage> {
                     context: context,
                     initialDate: selectedStartDate,
                     firstDate: DateTime.now(),
-                    lastDate: DateTime(2101), // Some arbitrary future date
+                    lastDate: DateTime(2101),
                   );
 
                   if (picked != null && picked != selectedStartDate) {
@@ -198,7 +192,7 @@ class _SalaryPageState extends State<SalaryPage> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(
-                        10.0), // Adjust the radius as needed
+                        10.0), 
                     color:
                         accountState == 0 ? hexToColor("FFD700") : Colors.blue,
                   ),
@@ -212,16 +206,7 @@ class _SalaryPageState extends State<SalaryPage> {
                 ),
               ),
             ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            //   child: ElevatedButton(
-            //     onPressed: () async {
-            //       // Save salary information to Firestore or perform necessary actions
-            //       await saveSalaryToFirestore();
-            //     },
-            //     child: Text('Save Salary'),
-            //   ),
-            // ),
+            
             Container(
               padding: EdgeInsets.only(top: 70),
               child: Center(
@@ -281,26 +266,22 @@ class _SalaryPageState extends State<SalaryPage> {
     while (nextSalaryDate.isBefore(currentDate)) {
       switch (selectedFrequency) {
         case "Daily":
-          // If the frequency is daily, add salary every day
           await addSalaryToBalance(amountToAdd);
           nextSalaryDate = nextSalaryDate.add(Duration(days: 1));
           break;
 
         case "Weekly":
-          // If the frequency is weekly, add salary every week
           await addSalaryToBalance(amountToAdd);
           nextSalaryDate = nextSalaryDate.add(Duration(days: 7));
           break;
 
         case "Monthly":
-          // If the frequency is monthly, add salary every month
           await addSalaryToBalance(amountToAdd);
           nextSalaryDate = DateTime(nextSalaryDate.year,
               nextSalaryDate.month + 1, nextSalaryDate.day);
           break;
 
         case "Yearly":
-          // If the frequency is yearly, add salary every year
           await addSalaryToBalance(amountToAdd);
           nextSalaryDate = DateTime(nextSalaryDate.year + 1,
               nextSalaryDate.month, nextSalaryDate.day);
