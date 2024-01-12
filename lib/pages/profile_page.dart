@@ -47,17 +47,19 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> removeSalary() async {
-    DateTime date = DateTime.now();
     await FirebaseFirestore.instance
         .collection("Users")
         .doc(currentUser!.email)
         .update({
+      "NextSalaryDate": FieldValue.delete(),
+      "NextUpdateDate": FieldValue.delete(),
       "Salary": {
-        "Frequency": "Yearly",
-        "Amount": 0,
-        "StartDate": date,
+        "Frequency": "None", 
+        "Amount": 0.0,
+        //"StartDate": DateTime.now(), 
       },
     });
+
   }
 
   Future<void> editField(String field) async {
@@ -268,7 +270,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     height: 30,
                   ),
-
 
                   //!user detial
                   Padding(

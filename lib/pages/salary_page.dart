@@ -33,6 +33,12 @@ class _SalaryPageState extends State<SalaryPage> {
   DateTime selectedStartDate = DateTime.now();
 
   @override
+  // void initState() {
+  //   //super.initState();
+  //   updateBalance();
+  // }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
@@ -106,7 +112,6 @@ class _SalaryPageState extends State<SalaryPage> {
                 ),
               ],
             ),
-            
             SizedBox(
               height: 10,
             ),
@@ -115,7 +120,7 @@ class _SalaryPageState extends State<SalaryPage> {
               child: TextFormField(
                 onChanged: (value) {
                   setState(() {
-                    salaryAmount = double.parse(value);
+                    salaryAmount = double.tryParse(value) ?? 0.0;
                   });
                 },
                 controller: salaryController,
@@ -191,8 +196,7 @@ class _SalaryPageState extends State<SalaryPage> {
                   height: 35,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                        10.0), 
+                    borderRadius: BorderRadius.circular(10.0),
                     color:
                         accountState == 0 ? hexToColor("FFD700") : Colors.blue,
                   ),
@@ -206,7 +210,6 @@ class _SalaryPageState extends State<SalaryPage> {
                 ),
               ),
             ),
-            
             Container(
               padding: EdgeInsets.only(top: 70),
               child: Center(
@@ -221,6 +224,21 @@ class _SalaryPageState extends State<SalaryPage> {
         ),
       ),
     );
+  }
+
+  Future<void> removeSalary() async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .update({
+      "NextSalaryDate": FieldValue.delete(),
+      "NextUpdateDate": FieldValue.delete(),
+      "Salary": {
+        "Frequency": "None",
+        "Amount": 0.0,
+        //"StartDate": DateTime.now(),
+      },
+    });
   }
 
   Future<void> saveSalaryToFirestore() async {
@@ -242,6 +260,7 @@ class _SalaryPageState extends State<SalaryPage> {
         );
       },
     );
+    removeSalary();
     // Save salary details to Firestore
     await FirebaseFirestore.instance
         .collection("Users")
@@ -254,8 +273,36 @@ class _SalaryPageState extends State<SalaryPage> {
       },
     });
 
+    DateTime nextUpdateDate =
+        calculateNextSalaryDate(selectedStartDate, selectedFrequency);
+
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .update({
+      "NextUpdateDate": nextUpdateDate,
+    });
+
     // Update balance based on salary frequency
     await updateBalance();
+    salaryController.clear();
+    Navigator.pop(context);
+    Get.to(BottomNavi());
+  }
+
+  DateTime calculateNextSalaryDate(DateTime current, String frequency) {
+    switch (frequency) {
+      case "Daily":
+        return current.add(Duration(days: 1));
+      case "Weekly":
+        return current.add(Duration(days: 7));
+      case "Monthly":
+        return DateTime(current.year, current.month + 1, current.day);
+      case "Yearly":
+        return DateTime(current.year + 1, current.month, current.day);
+      default:
+        return current; // none
+    }
   }
 
   Future<void> updateBalance() async {
@@ -263,30 +310,46 @@ class _SalaryPageState extends State<SalaryPage> {
     DateTime nextSalaryDate = selectedStartDate;
     double amountToAdd = salaryAmount;
 
-    while (nextSalaryDate.isBefore(currentDate)) {
+    // Retrieve the stored next update date from Firestore
+    var snapshot = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .get();
+
+    if (snapshot.exists && snapshot.data()?["NextUpdateDate"] != null) {
+      nextSalaryDate = snapshot.data()?["NextUpdateDate"].toDate();
+    } else {
+      nextSalaryDate = selectedStartDate;
+    }
+
+    // Check if the next update date has passed
+    if (nextSalaryDate.isBefore(currentDate)) {
+      await addSalaryToBalance(amountToAdd);
+
+      // Calculate and store the next update date
       switch (selectedFrequency) {
         case "Daily":
-          await addSalaryToBalance(amountToAdd);
           nextSalaryDate = nextSalaryDate.add(Duration(days: 1));
           break;
-
         case "Weekly":
-          await addSalaryToBalance(amountToAdd);
           nextSalaryDate = nextSalaryDate.add(Duration(days: 7));
           break;
-
         case "Monthly":
-          await addSalaryToBalance(amountToAdd);
           nextSalaryDate = DateTime(nextSalaryDate.year,
               nextSalaryDate.month + 1, nextSalaryDate.day);
           break;
-
         case "Yearly":
-          await addSalaryToBalance(amountToAdd);
           nextSalaryDate = DateTime(nextSalaryDate.year + 1,
               nextSalaryDate.month, nextSalaryDate.day);
           break;
       }
+
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(currentUser!.email)
+          .update({
+        "NextUpdateDate": nextSalaryDate,
+      });
     }
     salaryController.clear();
     Navigator.pop(context);
@@ -294,7 +357,6 @@ class _SalaryPageState extends State<SalaryPage> {
   }
 
   Future<void> addSalaryToBalance(double amount) async {
-    // Fetch the current balance
     var snapshot = await FirebaseFirestore.instance
         .collection("Users")
         .doc(currentUser!.email)
@@ -307,7 +369,6 @@ class _SalaryPageState extends State<SalaryPage> {
       // Update the balance by adding the salary amount
       double newBalance = currentBalance + amount;
 
-      // Update the Firestore document with the new balance
       await FirebaseFirestore.instance
           .collection("Users")
           .doc(currentUser!.email)

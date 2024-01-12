@@ -42,31 +42,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> updateBalance(DateTime nextSalaryDate, double amountToAdd,
       String selectedFrequency) async {
+    print("888888888888888888888988988989888989898989898989889898989");
     DateTime currentDate = DateTime.now();
 
     while (nextSalaryDate.isBefore(currentDate)) {
       switch (selectedFrequency) {
         case "Daily":
-          // If the frequency is daily, add salary every day
           await addSalaryToBalance(amountToAdd);
           nextSalaryDate = nextSalaryDate.add(Duration(days: 1));
           break;
 
         case "Weekly":
-          // If the frequency is weekly, add salary every week
           await addSalaryToBalance(amountToAdd);
           nextSalaryDate = nextSalaryDate.add(Duration(days: 7));
           break;
 
         case "Monthly":
-          // If the frequency is monthly, add salary every month
           await addSalaryToBalance(amountToAdd);
           nextSalaryDate = DateTime(nextSalaryDate.year,
               nextSalaryDate.month + 1, nextSalaryDate.day);
           break;
 
         case "Yearly":
-          // If the frequency is yearly, add salary every year
           await addSalaryToBalance(amountToAdd);
           nextSalaryDate = DateTime(nextSalaryDate.year + 1,
               nextSalaryDate.month, nextSalaryDate.day);
@@ -208,7 +205,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: Stack(
             children: [
-              
               Padding(
                 padding: EdgeInsets.only(top: h * 0.035, left: w * 0.02),
                 child: Column(
@@ -306,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 top: 30,
                 left: 20,
                 child: Text(
-                  'Total Balance', 
+                  'Total Balance',
                   style: TextStyle(color: Colors.white, fontSize: 17),
                 )),
             Positioned(
@@ -335,7 +331,7 @@ class _MyHomePageState extends State<MyHomePage> {
               bottom: 20,
               right: 20,
               child: Image.asset(
-                'assets/img/visa.png', 
+                'assets/img/visa.png',
                 width: 60,
                 height: 30,
                 color: Colors.white,
@@ -559,31 +555,68 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> checkAndUpdateSalaryIfNeeded() async {
+    var userDoc = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser?.email)
+        .get();
+
+    if (userDoc.exists) {
+      Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+      // Check if salary data exists and amount is not zero
+      if (userData.containsKey('Salary') &&
+          userData['Salary']['Amount'] != 0.0) {
+        DateTime salaryStartDate = userData['Salary']['StartDate'].toDate();
+        String frequency = userData['Salary']['Frequency'];
+        double amount = userData['Salary']['Amount'];
+
+        DateTime nextSalaryDate;
+        // Initialize nextSalaryDate with a default or previously stored value
+        if (userData.containsKey('NextSalaryDate')) {
+          nextSalaryDate = userData['NextSalaryDate'].toDate();
+        } else {
+          nextSalaryDate = salaryStartDate;
+        }
+
+        // Check if the current date is after the nextSalaryDate
+        if (DateTime.now().isAfter(nextSalaryDate)) {
+          await updateBalance(nextSalaryDate, amount, frequency);
+
+          // Calculate and update the new nextSalaryDate based on the frequency
+          nextSalaryDate = calculateNextSalaryDate(nextSalaryDate, frequency);
+
+          FirebaseFirestore.instance
+              .collection("Users")
+              .doc(currentUser?.email)
+              .update({
+            'NextSalaryDate': nextSalaryDate,
+          });
+        }
+      }
+    }
+  }
+
+  DateTime calculateNextSalaryDate(DateTime current, String frequency) {
+    switch (frequency) {
+      case "Daily":
+        return current.add(Duration(days: 1));
+      case "Weekly":
+        return current.add(Duration(days: 7));
+      case "Monthly":
+        return DateTime(current.year, current.month + 1, current.day);
+      case "Yearly":
+        return DateTime(current.year + 1, current.month, current.day);
+      default:
+        return current; // In case of none
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
+    checkAndUpdateSalaryIfNeeded();
     checkAndDeductOverdueBillsOnAppLaunch();
-    FirebaseFirestore.instance
-        .collection("Users")
-        .doc(currentUser?.email)
-        .get()
-        .then((snapshot) async {
-      if (snapshot.exists) {
-        Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
-
-        DateTime? salaryStartDate = userData['Salary']['StartDate']?.toDate();
-
-        if (salaryStartDate != null) {
-          DateTime nextSalaryDate = salaryStartDate;
-
-          if (nextSalaryDate.isAfter(DateTime.now())) {
-            await updateBalance(nextSalaryDate, userData['Salary']['Amount'],
-                userData['Salary']['Frequency']);
-          }
-        }
-      }
-    });
   }
 
   @override
