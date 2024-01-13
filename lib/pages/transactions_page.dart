@@ -253,41 +253,77 @@ class _TransactionsState extends State<Transactions> {
                             (context, index) {
                               var transaction = transactions?[index].data()
                                   as Map<String, dynamic>;
-                              return ListTile(
-                                leading: Image.asset(
-                                  "assets/addings/${transaction['name']}.png",
-                                  width: 60,
-                                  height: 60, 
-                                  fit: BoxFit.cover,
-                                ),
-                                title: Text(
-                                  transaction['name'],
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      formatTransactionDate(
-                                          transaction['date'].toDate()),
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    Text(
-                                      transaction['explain'].toString(),
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                                trailing: Text(
-                                  "\$ ${transaction['amount'].toString()}",
-                                  style: TextStyle(
-                                    color: transaction['buy']
-                                        ? Colors.green
-                                        : Colors.red,
-                                    fontSize: 19,
+                              var transactionId = transactions?[index].id;
+                              return Dismissible(
+                                key: Key(transactionId!),
+                                background: Container(
+                                  color: Colors.red,
+                                  alignment: Alignment.centerRight,
+                                  padding: EdgeInsets.only(right: 16),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
                                   ),
                                 ),
-                                isThreeLine: true,
+                                onDismissed: (direction) {
+                                  // Delete the transaction from Firestore
+                                  FirebaseFirestore.instance
+                                      .collection("Users")
+                                      .doc(currentUser!.email)
+                                      .collection(accountState == 0
+                                          ? "Transactions"
+                                          : "Transactions Saving")
+                                      .doc(transactionId)
+                                      .delete();
+
+                                  // Optionally, show a snackbar or some feedback
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Transaction deleted',
+                                        style: TextStyle(),
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                },
+                                child: ListTile(
+                                  leading: Image.asset(
+                                    "assets/addings/${transaction['name']}.png",
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  title: Text(
+                                    transaction['name'],
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        formatTransactionDate(
+                                            transaction['date'].toDate()),
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      Text(
+                                        transaction['explain'].toString(),
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Text(
+                                    "\$ ${transaction['amount'].toString()}",
+                                    style: TextStyle(
+                                      color: transaction['buy']
+                                          ? Colors.green
+                                          : Colors.red,
+                                      fontSize: 19,
+                                    ),
+                                  ),
+                                  isThreeLine: true,
+                                ),
                               );
                             },
                             childCount: transactions?.length,

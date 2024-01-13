@@ -238,8 +238,7 @@ class _BillsState extends State<Bills> {
                       height: 35,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                            10.0),
+                        borderRadius: BorderRadius.circular(10.0),
                         color: accountState == 0
                             ? hexToColor("FFD700")
                             : Colors.blue,
@@ -334,6 +333,15 @@ class _BillsState extends State<Bills> {
                     key: UniqueKey(),
                     onDismissed: (direction) async {
                       await removeBill(bill);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Bill deleted',
+                            style: TextStyle(),
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     },
                     background: Container(
                       color: Colors.red,
